@@ -1,25 +1,37 @@
 'use client';
-import React from 'react';
-
-
-
+import React, { useEffect } from 'react';
+import axios from 'axios';
 
 const LoginHandler: React.FC =() => {
+  const code = new URL(window.location.href).searchParams.get("code");
+  const back ='back_redirect_uri';
 
-  const Code = new URL(window.location.href).searchParams.get("code");
-
- /* code 백엔드로 쏘기 
-  const response = await axios.get(
-    `${API 서버 주소/reqlogin}/oauth/token?code=${code}`,
-    { withCredentials: true }
-  );
-  */
-
-  //Code 를 백엔드로 쏘고 - access token 받아와서 - localstorage 저장 하면 끝.
+  useEffect(() => {
+    const kakaoLogin = async () => {
+		try {
+			const res = await axios.post(`${back}`, {
+				access_code: code
+			});
+			localStorage.setItem("access_token", res.data.access_token);
+			console.log(res);
+			console.log("성공" + code);
+			
+			// setTimeout(() => {
+			// 	window.location.href = '/main';
+			// }, 100);
+		} catch (error){
+			console.error("Error occured", error);
+			console.log(code);
+			// window.location.href = "/login";
+			} 
+	}; if(code) {
+		kakaoLogin();
+		}
+	}, [code]);
 
   return(
     <div>
-
+      
     </div>
   );
   
