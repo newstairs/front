@@ -1,12 +1,12 @@
 import LoginHandler from '@/app/_components/loginHandler'
 import React from 'react'
 
-const page: React.FC = () => {
+const Page: React.FC = () => {
   return (
-    <div>
+    <div className="h-screen flex justify-center items-center">
       <LoginHandler />
     </div>
   )
 }
 
-export default page
+export default Page;
