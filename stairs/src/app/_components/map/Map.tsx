@@ -30,7 +30,7 @@ const Map = () => {
   }, []);
 
   return (
-    <div className='relative top-14 w-full h-screen-50 '>
+    <div className='relative w-full h-screen-50 '>
       <div id="map" className="relative inset-0 w-full h-full"></div>
     </div>
   );
