@@ -1,5 +1,5 @@
 import React from "react";
-import Header from "../../_components/header";
+import Map from "@/app/_components/map/Map";
 
 const Main: React.FC = () => {
   //switch 0 : 1: 2: 
@@ -8,10 +8,10 @@ const Main: React.FC = () => {
   //2번이면 선택리스트
   
   return (
-    <div>
-      <Header/>
-      
-      <h1>메인입니다.</h1>
+    <div className="">
+      <div className="">
+        <Map />
+      </div>
     </div>
   );
 }
