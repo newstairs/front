@@ -17,7 +17,7 @@ const KakaoLogin: React.FC = () => {
     return (
         <div className="h-screen flex justify-center items-center">
           <button onClick={handleLogin} className="flex justify-center items-center">
-            <Image src="/utils/kakao_login.png" alt="카카오 로그인" width={300} height={50} />
+            <Image src="/utils/kakao_login.png" alt="카카오 로그인" width={300} height={50} priority />
           </button>
         </div>
     );
