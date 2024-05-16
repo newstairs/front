@@ -23,17 +23,14 @@ const MainContainer: React.FC = () => {
         return <MainList/>;
     }
   }
-  //switch 0 : 1: 2: 
-  //0번이면 장바구니
-  //1번이면 메인리스트
-  //2번이면 선택리스트
-  
+
   return (
     <div className="flex pt-14">
-      <Header/>
+      <Header onItemSelected={setActiveIndex}/>
       <Map/>
       <div className="overlay-container">
-        <CheckList />
+        {render()}
+        {/* <CheckList /> */}
         {/* <CartList/> */}
         {/* <MainList/> */} 
       </div>
