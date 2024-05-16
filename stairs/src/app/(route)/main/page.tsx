@@ -27,7 +27,7 @@ const Main: React.FC = () => {
   
   return (
     <div>
-    <MainContainer/>
+      <MainContainer/>
     </div>
   );
 }

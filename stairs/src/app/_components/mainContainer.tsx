@@ -29,10 +29,14 @@ const MainContainer: React.FC = () => {
   //2번이면 선택리스트
   
   return (
-    <div className="flex pt-16">
+    <div className="flex pt-14">
       <Header/>
       <Map/>
-      <CartList/>
+      <div className="overlay-container">
+        <CheckList />
+        {/* <CartList/> */}
+        {/* <MainList/> */} 
+      </div>
     </div>
   );
 }

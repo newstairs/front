@@ -19,7 +19,13 @@ const Map = () => {
           center: new kakao.maps.LatLng(33.450701, 126.570667),
           level: 3
         };
-        new kakao.maps.Map(container, options);
+        const map = new kakao.maps.Map(container, options);
+
+        const mapTypeControl = new kakao.maps.MapTypeControl();
+        map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPLEFT);  // 올바르게 `map` 참조
+
+        const zoomControl = new kakao.maps.ZoomControl();
+        map.addControl(zoomControl, kakao.maps.ControlPosition.LEFT);
       });
     };
 
