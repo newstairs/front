@@ -5,14 +5,21 @@ interface HeaderProps {
   onLocationChange: (lat: number, lng: number) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onLocationChange }) => {
+interface HeaderProps {
+  onItemSelected: (index: number) => void;  // 콜백 함수 타입 정의
+}
+
+const Header: React.FC<HeaderProps> = ({ onLocationChange, onItemSelected }) => {
   const [location, setLocation] = useState<string>('');
   const [query, setQuery] = useState<string>('');
+  const [activeIndex, setActiveIndex] = useState<number>(0); 
   const items: string[] = ["메인 품목 리스트", "마트 별 선택 항목", "장바구니"];
 
-  const handleClick = (index: number, item: string): void => {
-    console.log(`Clicked item: ${item}, Index: ${index}`);
-  };
+   const handleClick = (index: number, item: string): void => {
+    console.log(`Clicked item: ${items[index]}, Index: ${index}`);
+    onItemSelected(index);  
+    setActiveIndex(index);  
+  }
 
   // 현 위치 입력 관련 이벤트
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -37,11 +44,12 @@ const Header: React.FC<HeaderProps> = ({ onLocationChange }) => {
     }
   };
 
+
   return (
     <header className="fixed top-0 w-full shadow-md">
       <div className="flex justify-between">
         <div className="flex items-center pl-6">
-          <button className=""> 로그아웃 </button>
+          <button className="">로그아웃</button>
         </div>
         <div className="flex items-center">
           <form onSubmit={handleSubmit}>
@@ -57,7 +65,8 @@ const Header: React.FC<HeaderProps> = ({ onLocationChange }) => {
         <div>
           <ul className="flex space-x-4 p-4">
             {items.map((item, index) => (
-              <li key={index} onClick={() => handleClick(index, item)}>
+              <li key={index} onClick={() => handleClick(index, item)}
+                  className={`cursor-pointer ${index === activeIndex ? 'text-blue-500' : 'text-white-700'}`}>
                 {item}
               </li>
             ))}
@@ -67,5 +76,6 @@ const Header: React.FC<HeaderProps> = ({ onLocationChange }) => {
     </header>
   );
 };
+
 
 export default Header;

@@ -51,7 +51,7 @@ const MainContainer: React.FC = () => {
   
   return (
     <div className="flex pt-14">
-      <Header onLocationChange={handleLocationChange}/>
+      <Header onLocationChange={handleLocationChange} onItemSelected={setActiveIndex} />
       <div className=" flex flex-1">
         <div className="flex-1">
           <Map location={location}/>
