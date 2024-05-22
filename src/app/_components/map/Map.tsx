@@ -23,30 +23,30 @@ const Map: React.FC<MapProps> = ({ location }) => {
 
     // 스크립트 로드 완료 후 지도 생성
     script.onload = () => {
-      if (typeof kakao !== 'undefined') {
-        kakao.maps.load(() => {
+      if (typeof window !== 'undefined' && window.kakao) {
+        window.kakao.maps.load(() => {
           const { lat, lng } = location || { lat: 33.450701, lng: 126.570667 };
           const container = document.getElementById('map');
           const options = {
-            center: new kakao.maps.LatLng(lat, lng),
+            center: new window.kakao.maps.LatLng(lat, lng),
             level: 3,
           };
-          const map = new kakao.maps.Map(container, options);
+          const map = new window.kakao.maps.Map(container, options);
           mapRef.current = map; // map 객체를 ref로 저장
 
           // 마커 추가
-          const markerPosition = new kakao.maps.LatLng(lat, lng);
-          const marker = new kakao.maps.Marker({
+          const markerPosition = new window.kakao.maps.LatLng(lat, lng);
+          const marker = new window.kakao.maps.Marker({
             position: markerPosition,
           });
           marker.setMap(map);
 
           // 사용자 컨트롤 추가
-          const mapTypeControl = new kakao.maps.MapTypeControl();
-          map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPLEFT);
+          const mapTypeControl = new window.kakao.maps.MapTypeControl();
+          map.addControl(mapTypeControl, window.kakao.maps.ControlPosition.TOPLEFT);
 
-          const zoomControl = new kakao.maps.ZoomControl();
-          map.addControl(zoomControl, kakao.maps.ControlPosition.LEFT);
+          const zoomControl = new window.kakao.maps.ZoomControl();
+          map.addControl(zoomControl, window.kakao.maps.ControlPosition.LEFT);
         });
       }
     };
@@ -59,9 +59,9 @@ const Map: React.FC<MapProps> = ({ location }) => {
 
   const panTo = () => {
     // 이동할 위도 경도 위치를 생성합니다
-    if (typeof kakao !== 'undefined' && mapRef.current) {
+    if (typeof window !== 'undefined' && window.kakao && mapRef.current) {
       const { lat, lng } = location || { lat: 33.450701, lng: 126.570667 };
-      const moveLatLon = new kakao.maps.LatLng(lat, lng);
+      const moveLatLon = new window.kakao.maps.LatLng(lat, lng);
 
       // 지도 중심을 부드럽게 이동시킵니다
       // 만약 이동할 거리가 지도 화면보다 크면 부드러운 효과 없이 이동합니다
