@@ -12,6 +12,8 @@ interface MapProps {
 
 const Map: React.FC<MapProps> = ({ location }) => {
   const kakao_map_api_key = process.env.NEXT_PUBLIC_JAVASCRIPT_API_KEY;
+
+  // @ts-ignore
   const mapRef = useRef<kakao.maps.Map | null>(null);
 
   useEffect(() => {
