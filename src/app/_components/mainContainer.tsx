@@ -8,8 +8,8 @@ import CartList from "./overlays/cartList";
 
 
 const MainContainer: React.FC = () => {
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const [location, setLocation] = useState<{ lat: number; lng: number }>({ lat: 33.450701, lng: 126.570667 });
   const [kakaoLoaded, setKakaoLoaded] = useState(false);
 
   useEffect(() => {
@@ -45,7 +45,7 @@ const MainContainer: React.FC = () => {
   }
 
   // 지도 현 위치 props값 전달
-  const handleLocationChange = (lat, lng) => {
+  const handleLocationChange = (lat: number, lng: number) => {
     setLocation({ lat, lng });
   };
   
