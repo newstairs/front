@@ -25,4 +25,4 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: secrets
-                  key: javascrpit-api-key
+                  key: javascript-api-key
