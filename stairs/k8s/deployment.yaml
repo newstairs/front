@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: krmp-d2hub-idock.9rum.cc/dev-test/repo_4dc4c195ef1d
+          imagePullPolicy: Always
+          env:
+            - name: NEXT_PUBLIC_REST_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: client-id
+            - name: NEXT_PUBLIC_JAVASCRIPT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: javascrpit-api-key

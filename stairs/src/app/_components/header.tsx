@@ -15,7 +15,7 @@ const Header: React.FC<HeaderProps> = ({ onLocationChange, onItemSelected }) => 
   const [activeIndex, setActiveIndex] = useState<number>(0); 
   const items: string[] = ["메인 품목 리스트", "마트 별 선택 항목", "장바구니"];
 
-   const handleClick = (index: number, item: string): void => {
+  const handleClick = (index: number, item: string): void => {
     console.log(`Clicked item: ${items[index]}, Index: ${index}`);
     onItemSelected(index);  
     setActiveIndex(index);  
