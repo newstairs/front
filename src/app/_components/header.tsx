@@ -3,9 +3,6 @@ import React, { useState, ChangeEvent, FormEvent } from "react";
 
 interface HeaderProps {
   onLocationChange: (lat: number, lng: number) => void;
-}
-
-interface HeaderProps {
   onItemSelected: (index: number) => void;  // 콜백 함수 타입 정의
 }
 
@@ -29,9 +26,9 @@ const Header: React.FC<HeaderProps> = ({ onLocationChange, onItemSelected }) => 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     // 주소 검색 API 호출
-    if (window.kakao && window.kakao.maps && window.kakao.maps.services) {
+    if (typeof window !== 'undefined' && window.kakao && window.kakao.maps && window.kakao.maps.services) {
       const geocoder = new window.kakao.maps.services.Geocoder();
-      geocoder.addressSearch(query, (result, status) => {
+      geocoder.addressSearch(query, (result: kakao.maps.services.GeocoderResult[], status: kakao.maps.services.Status) => {
         if (status === window.kakao.maps.services.Status.OK) {
           const { y: lat, x: lng } = result[0];
           onLocationChange(lat, lng);
@@ -43,7 +40,6 @@ const Header: React.FC<HeaderProps> = ({ onLocationChange, onItemSelected }) => 
       alert('Kakao Maps API를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
     }
   };
-
 
   return (
     <header className="fixed top-0 w-full shadow-md">
@@ -76,6 +72,5 @@ const Header: React.FC<HeaderProps> = ({ onLocationChange, onItemSelected }) => 
     </header>
   );
 };
-
 
 export default Header;
