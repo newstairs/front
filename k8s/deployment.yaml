@@ -31,3 +31,5 @@ spec:
                 secretKeyRef:
                   name: secrets
                   key: front-redirect-url
+      imagePullSecrets:
+        - name: secrets
