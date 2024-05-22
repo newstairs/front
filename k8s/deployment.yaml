@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: krmp-d2hub-idock.9rum.cc/dev-test/repo_4dc4c195ef1d
+          image: krmp-d2hub-idock.9rum.cc/dev-test/repo_80ede9501eaa
           imagePullPolicy: Always
           env:
             - name: NEXT_PUBLIC_REST_API_KEY
