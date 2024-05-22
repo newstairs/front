@@ -11,7 +11,8 @@ interface MapProps {
 }
 
 const Map: React.FC<MapProps> = ({ location }) => {
-  const kakao_map_api_key = process.env.NEXT_PUBLIC_JAVASCRIPT_API_KEY;
+  // const kakao_map_api_key = process.env.NEXT_PUBLIC_JAVASCRIPT_API_KEY;
+  const kakao_map_api_key = 'd39722e61cfc17e834f62d6fb7e6a052';
   console.log('Kakao Map API Key:', kakao_map_api_key);
   console.log('NEXT_PUBLIC_JAVASCRIPT_API_KEY:', process.env.NEXT_PUBLIC_JAVASCRIPT_API_KEY);
 
