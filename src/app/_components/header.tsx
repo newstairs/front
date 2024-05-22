@@ -28,7 +28,7 @@ const Header: React.FC<HeaderProps> = ({ onLocationChange, onItemSelected }) => 
     // 주소 검색 API 호출
     if (typeof window !== 'undefined' && window.kakao && window.kakao.maps && window.kakao.maps.services) {
       const geocoder = new window.kakao.maps.services.Geocoder();
-      geocoder.addressSearch(query, (result: kakao.maps.services.GeocoderResult[], status: kakao.maps.services.Status) => {
+      geocoder.addressSearch(query, (result: any, status: any) => {
         if (status === window.kakao.maps.services.Status.OK) {
           const { y: lat, x: lng } = result[0];
           onLocationChange(lat, lng);
