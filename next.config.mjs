@@ -15,6 +15,10 @@ const nextConfig = {
   },
 };
 
+const decodeBase64 = (encoded) => {
+  return Buffer.from(encoded, 'base64').toString('utf8');
+};
+
 // YAML 파일에서 환경 변수를 로드
 const loadEnvFromYaml = () => {
   try {
@@ -24,7 +28,7 @@ const loadEnvFromYaml = () => {
 
     for (const key in data) {
       if (Object.prototype.hasOwnProperty.call(data, key)) {
-        process.env[key] = data[key];
+        process.env[key] = decodeBase64(data[key]);
       }
     }
   } catch (e) {
