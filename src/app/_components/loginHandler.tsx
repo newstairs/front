@@ -4,11 +4,11 @@ import React, { useEffect } from 'react';
 
 const LoginHandler: React.FC =() => {
   const code = new URL(window.location.href).searchParams.get("code");
-  const back ='백엔드 주소';
+  const back = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   useEffect(() => {
     const kakaoLogin = async () => {
-      if(code){
+      if(code && back){
         try{
           const response = await fetch(`${back}`,{
             method:'POST',

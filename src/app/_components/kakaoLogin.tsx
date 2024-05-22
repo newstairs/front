@@ -8,6 +8,10 @@ const KakaoLogin: React.FC = () => {
   const REDIRECT_URI = process.env.NEXT_PUBLIC_REDIRECT_URI;
   const Link =`https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}`;
 
+  if (!REST_API_KEY || !REDIRECT_URI) {
+    return null; // 환경 변수가 없으면 아무것도 렌더링하지 않음
+  }
+
     const handleLogin = () => {
       console.log(REST_API_KEY);
       console.log(REDIRECT_URI);
