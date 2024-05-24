@@ -82,7 +82,7 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
                   };
                   
                   // target의 위치를 추적하는 함수
-                  function tracking() {
+                  function tracking(this: any) {
                       var proj = map.getProjection();
                       
                       // 지도의 영역을 구합니다.
@@ -276,17 +276,17 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
                   }
                   
                   // tracker의 보임/숨김을 지정하는 함수
-                  function setVisible(visible:any) {
+                  function setVisible(this: any, visible:any) {
                       tracker.style.display = visible ? 'block' : 'none';
                   }
                   
                   // Map 객체의 'zoom_start' 이벤트 핸들러
-                  function hideTracker() {
+                  function hideTracker(this: any) {
                       setVisible(false);
                   }
                   
                   // target의 추적을 실행합니다.
-                  this.run = function() {
+                  this.run = function(this: any) {
                       window.kakao.maps.event.addListener(map, 'zoom_start', hideTracker);
                       window.kakao.maps.event.addListener(map, 'zoom_changed', tracking);
                       window.kakao.maps.event.addListener(map, 'center_changed', tracking);
@@ -294,7 +294,7 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
                   };
                   
                   // target의 추적을 중지합니다.
-                  this.stop = function() {
+                  this.stop = function(this: any) {
                       window.kakao.maps.event.removeListener(map, 'zoom_start', hideTracker);
                       window.kakao.maps.event.removeListener(map, 'zoom_changed', tracking);
                       window.kakao.maps.event.removeListener(map, 'center_changed', tracking);
@@ -342,7 +342,7 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
                 }
             })
             .then((res)=>{
-               return res.json();
+              return res.json();
             })
             console.log("category:",data);
 
@@ -481,10 +481,10 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
       
               return [year+month+dt,hour_now]
       
-               
+              
       
             }
-         
+        
             function makeareacode(name:string){
               switch(name){
                   case "서울":
@@ -500,7 +500,7 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
                   case "대구":
                   case "경북":
                       return "143";
-                   
+                  
                   case "광주":
                   case "전남":
                       return "156";
@@ -508,7 +508,7 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
       
                   case "전북":
                       return "146";
-                     
+                    
                   case "대전":
                   case "세종":
                   case "충남":
@@ -519,7 +519,7 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
                       
                   case "강원도":
                       return "105";
-                   
+                  
               }
       
       
@@ -536,18 +536,18 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
                   case "울산":
                   case "경남":
                       return "159"
-                   
+                  
                   case "대구":
                   case "경북":
                       return "143";
-                 
+                
                   case  "광주":
                   case "전남":
                       return "!56";
                       break;
                   case "전북":
                       return "146";
-                   
+                  
                   case "대전":
                   case "세종":
                   case "충남":
@@ -835,7 +835,7 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
         
         
                     }
-                  
+                
             
                     }*/
                     console.log("origin_name:",origin_name);
