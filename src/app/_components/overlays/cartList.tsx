@@ -71,6 +71,8 @@
 
 import React, { useState } from 'react';
 import '../../styles/overlayContainer.css';
+import Map from "../map/Map";
+
 
 interface CartItem {
   id: number;
@@ -96,6 +98,16 @@ const CartList: React.FC = () => {
       )
     );
   };
+  const [location, setLocation] =useState<{ datas:string[] }>(null);
+  //useState<{ lat: number; lng: number}> ({lat: 33.450701, lng: 126.570667 });
+ 
+  const clicketst=()=>{
+    //setLocation({lat,lng})
+    setLocation({datas:["KB국민은행 상계역지점","IBK기업은행365 중계주공3단지아파트"]})
+   console.log("click---test")
+   
+  }
+  
 
   return (
     <div className="overlay-container">
@@ -110,6 +122,7 @@ const CartList: React.FC = () => {
           <button type="submit" className="text-white absolute right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">검색</button>
         </div>
       </form>
+     
         <ul className="divide-y divide-gray-200">
           {cartItems.map(item => (
             <li key={item.id} className="flex items-center justify-between p-2">
@@ -128,7 +141,9 @@ const CartList: React.FC = () => {
             </li>
           ))}
         </ul>
+        <button onClick={()=>clicketst()}>hello? {location!==null &&<Map location={location}/>}</button>
     </div>
+    
 //     <div className="overlay-container">
 //   <ul className="divide-y divide-gray-200">
 //     {cartItems.map(item => (

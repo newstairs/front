@@ -9,7 +9,8 @@ import CartList from "./overlays/cartList";
 
 const MainContainer: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState<number>(0);
-  const [location, setLocation] = useState<{ lat: number; lng: number }>({ lat: 33.450701, lng: 126.570667 });
+  //const [location, setLocation] = useState<{ lat: number; lng: number }>({ lat: 33.450701, lng: 126.570667 });
+  const [location, setLocation] =  useState<{ datas:string[] }>({datas:["KB국민은행 상계역지점","IBK기업은행365 중계주공3단지아파트","코리아세븐 세븐-중계2호 ATM"]})//useState<{ lat: number; lng: number }>({ lat: 33.450701, lng: 126.570667 });
   const [kakaoLoaded, setKakaoLoaded] = useState(false);
 
   useEffect(() => {
@@ -46,7 +47,8 @@ const MainContainer: React.FC = () => {
 
   // 지도 현 위치 props값 전달
   const handleLocationChange = (lat: number, lng: number) => {
-    setLocation({ lat, lng });
+    
+    //setLocation({ lat, lng });
   };
   
   return (
