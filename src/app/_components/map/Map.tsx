@@ -1200,12 +1200,25 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
               //오버레이에띄울 데이터들을 테스트용으로 넣은것. 추후에 백과 연결되면  바꿀것.
       
       
-              var contents=`<div class="customoverlay">martname:${datas[0].name}`
-              datas[0].itemlist.forEach(x=>{
-                  contents+=`<div class="list">itemname:${x.itemname}</br>price:${x.price}</br>length:${Math.round(polyline.getLength())}</br>
-                      time:${timechange(Math.round(polyline.getLength()/1.34))}</div>`
-              })
+              // var contents ;
+              // datas[0].itemlist.forEach(x=>{
+							// 		contents=`<div class="customoverlay">martname:${datas[0].name}itemname:${x.itemname}</br>price:${x.price}</br>length:${Math.round(polyline.getLength())}</br>
+							// 		time:${timechange(Math.round(polyline.getLength()/1.34))}</div>`
+              // })
               contents+=`${pos_data[1].place_name}</br></div>`
+							var contents = `<div class="customoverlay bg-white shadow-lg rounded-lg p-4">`;
+								datas[0].itemlist.forEach(x => {
+											contents += `<div class="mb-4">
+											<ul class="list-none space-y-2">
+													<li class="font-bold text-lg">martname: ${datas[0].name}</li>
+													<li>itemname: ${x.itemname}</li>
+													<li>price: ${x.price}</li>
+											</ul>
+									</div>`;
+});
+contents += `<div class="pt-2">${pos_data[1].place_name}</div></div>`;
+
+					
               //오버레이에 들어갈 내용들을 만드는 과정 참고로 string타입으로 들어간 각태그들의 id,class값들은 css파일의 영향을 받아서
               //디자인이 가능하다.
       
