@@ -56,9 +56,7 @@ const MainContainer: React.FC = () => {
         <div className="flex-1">
           <Map location={location}/>
         </div>
-        <div className="overlay w-[33%]">
           {render()}
-        </div>
       </div>
     </div>
   );
