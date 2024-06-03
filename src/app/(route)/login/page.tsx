@@ -1,5 +1,5 @@
 import React from 'react';
-import KakaoLogin from '../../_components/kakaoLogin';
+import KakaoLogin from '../../../components/Login/KakaoLogin';
 
 const Login: React.FC = () => {
   return(

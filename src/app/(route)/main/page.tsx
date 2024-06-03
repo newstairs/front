@@ -1,10 +1,7 @@
 import React from "react";
-import MainContainer from "../../_components/mainContainer";
+import MainContainer from "../../../components/Main/MainContainer";
 
-
-const Main: React.FC = () => {
-
-  
+const MainPage: React.FC = () => {
   return (
     <div>
       <MainContainer/>
@@ -12,7 +9,4 @@ const Main: React.FC = () => {
   );
 }
 
-export default Main;
-
-
-
+export default MainPage;
