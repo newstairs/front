@@ -1,16 +1,12 @@
-.customoverlay{
-    background-color:skyblue;
-    width:200px;
-    height:200px;
+.customoverlay {
+  background-color: skyblue;
 }
-
-.list{
-    background-color: pink;
-    width:150px;
-    height:100px;
-}
-
-
+/* 
+.list {
+  background-color: pink;
+  width: 150px;
+  height: 100px;
+} */
 
 
 
@@ -26,34 +22,31 @@
 
 
 .tracker {
-    position: absolute;
-    margin: -35px 0 0 -30px;
-    display: none;
-    cursor: pointer;
-    z-index: 3;
+  position: absolute;
+  margin: -35px 0 0 -30px;
+  display: none;
+  cursor: pointer;
+  z-index: 3;
 }
 
 .icon {
-    position: absolute;
-    left: 6px;
-    top: 9px;
-    width: 48px;
-    height: 48px;
-    background-image: url(https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/sign-info-48.png);
+  position: absolute;
+  left: 6px;
+  top: 9px;
+  width: 48px;
+  height: 48px;
+  background-image: url(https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/sign-info-48.png);
 }
 
 .balloon {
-    position: absolute;
-    width: 60px;
-    height: 60px;
-    background-image: url(https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/balloon.png);
-    -ms-transform-origin: 50% 34px;
-    -webkit-transform-origin: 50% 34px;
-    transform-origin: 50% 34px;
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background-image: url(https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/balloon.png);
+  -ms-transform-origin: 50% 34px;
+  -webkit-transform-origin: 50% 34px;
+  transform-origin: 50% 34px;
 }
-#showmarker{
-
-    background-color:red;
- 
-
+#showmarker {
+  background-color: red;
 }
