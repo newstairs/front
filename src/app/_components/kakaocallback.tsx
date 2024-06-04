@@ -3,14 +3,14 @@ import React ,{ useEffect } from 'react';
 ;import { useSearchParams,useRouter } from 'next/navigation'
 
 const KakaoCallback: React.FC = () => {
- const code=useSearchParams();
- const BACKEND_URL =process.env.NEXT_PUBLIC_BACK_END_URL;
- const router=useRouter();
+  const code = useSearchParams();
+  const BACKEND_URL = 'http://localhost:3000/reqlogin';
+  const router = useRouter();
+
   useEffect(() => {
     console.log("code:",code.get("code").substring(1))
     const kakaoLogin = async () => {
 
-      
         const response = await fetch(`http://localhost:3000/reqlogin`, {
           method: 'POST',
           headers: {
@@ -19,9 +19,6 @@ const KakaoCallback: React.FC = () => {
           body: JSON.stringify({ access_code: code.get("code") })
         })
         .then((res)=>{return res.json();})
-
-  
-      
         localStorage.setItem('access_token',response.data);
         console.log("성공:",typeof(response.data));
         
