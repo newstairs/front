@@ -9,6 +9,14 @@ const nextConfig = {
         permanent: true,
       },
     ];
+  },  
+  async rewrites() {
+    return [
+      {
+        source: "/:path*",
+        destination: "http://ec2-15-164-104-176.ap-northeast-2.compute.amazonaws.com:8080/:path*",
+      },
+    ];
   },
   env: {
     NEXT_PUBLIC_REST_API_KEY: process.env.NEXT_PUBLIC_REST_API_KEY,
