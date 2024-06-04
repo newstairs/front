@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from "react";
-import '../../styles/overlayContainer.css';
+import '../../../styles/overlayContainer.css';
 
 interface selectItem {
   id: number;

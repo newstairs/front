@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../../styles/overlayContainer.css';
+import '../../../styles/overlayContainer.css';
 import Map from "../map/Map";
 
 

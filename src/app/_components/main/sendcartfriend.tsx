@@ -19,7 +19,7 @@ interface CartItem {
     mart: string; // 마트 이름
     price: number; // 가격
     quantity: number; // 초기 수량
-  }
+}
 interface Test{
     name:string;
 }
@@ -35,9 +35,9 @@ const SendCartlist: React.FC<MapProps>=({cartlist,carttruth})=>{
         console.log("carttruth.datas:",carttruth.datas);
         const list=document.querySelectorAll(".li");
         Array.from(list).map((el,idx)=>{
-           if(el.childNodes[0].checked){
+        if(el.childNodes[0].checked){
             console.log(el.childNodes[1].textContent);
-           }
+        }
     })
 
     }

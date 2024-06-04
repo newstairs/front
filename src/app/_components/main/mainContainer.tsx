@@ -1,6 +1,6 @@
 'use client';
 import React,{useState, useEffect} from "react";
-import Header from "./header";
+import Header from "../header/header";
 import Map from "./map/Map";
 import MainList from "./overlays/mainList";
 import CheckList from "./overlays/checkList";

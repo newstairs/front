@@ -1,6 +1,6 @@
 
 interface weather{
-   
+
     weathers:string
 }
 
@@ -30,10 +30,10 @@ const WeatherModal: React.FC<MapProps> =({weather})=>{
     console.log("weather:",weather)
 
     return (<div id="modal" className="w-[500px] h-[500px] bg-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2   rounded-lg shadow-md z-20">
-           <button onClick={()=>deletemodal()}>x</button>
-           <input type="checkbox" onClick={()=>changelocal()} className="w-[50px] h-[50px] bg-black"></input>
-           
-            {weather.weathers}
+        <button onClick={()=>deletemodal()}>x</button>
+        <input type="checkbox" onClick={()=>changelocal()} className="w-[50px] h-[50px] bg-black"></input>
+        
+        {weather.weathers}
     </div>);
 
 

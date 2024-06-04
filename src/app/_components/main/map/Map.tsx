@@ -1,13 +1,12 @@
 'use client';
 import React, { useEffect, useRef } from 'react';
-import '../../styles/mapmarker.css'
+import '../../../styles/mapmarker.css'
 
 
 interface Location {
   lat: number,
   lng: number
 }
-
 
 
 interface qa{
@@ -26,12 +25,11 @@ interface coords{
     speed:number
 }
 
+
 interface geolocationposition{
     coords:coords,
     timestamp:number
 }
-
-
 
 
 interface meta {
@@ -41,6 +39,7 @@ interface meta {
     total_throw:number
 
 }
+
 
 interface documentarr {
     address_name:string,
@@ -57,14 +56,18 @@ interface documentarr {
     y:string
 }
 
+
 interface Place_Data{
     documents:documentarr[]
     meta:meta
 }
 
+
 interface Location {
-    datas:string []
-  }
+  datas:string []
+}
+
+
 interface MapProps {
   location: Location;
 }
@@ -96,94 +99,70 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
     // 스크립트 로드 완료 후 지도 생성
     script.onload = () => {
 
-      if (typeof kakao !== 'undefined') {
-        kakao.maps.load(() => {
-         /*const { lat, lng } = location || { lat: 33.450701, lng: 126.570667 };
-          const container = document.getElementById('map');
-          const options = {
-            center: new window.kakao.maps.LatLng(lat, lng),
-            level: 3,
-          };
-          const map = new window.kakao.maps.Map(container, options);
-          mapRef.current = map; // map 객체를 ref로 저장
+      if (typeof window.kakao !== 'undefined') {
+        window.kakao.maps.load(() => {
 
-          // 마커 추가
-          const markerPosition = new window.kakao.maps.LatLng(lat, lng);
-          const marker = new window.kakao.maps.Marker({
-            position: markerPosition,
-          });
-          marker.setMap(map);
-
-          // 사용자 컨트롤 추가
-          const mapTypeControl = new window.kakao.maps.MapTypeControl();
-          map.addControl(mapTypeControl, window.kakao.maps.ControlPosition.TOPLEFT);
-
-          const zoomControl = new kakao.maps.ZoomControl();
-          map.addControl(zoomControl, kakao.maps.ControlPosition.LEFT);
-          */
-
-      
-            //애는 트레커 만드느 함수인대... 읽어보고싶다면 읽어보시길 그냥 run,stop만 쓸줄알면된다.
-            function MarkerTracker(map:any, target:any) {
-                // 클리핑을 위한 outcode
-                var OUTCODE = {
-                    INSIDE: 0, // 0b0000
-                    TOP: 8, //0b1000
-                    RIGHT: 2, // 0b0010
-                    BOTTOM: 4, // 0b0100
-                    LEFT: 1 // 0b0001
-                };
+          //애는 트레커 만드느 함수인대... 읽어보고싶다면 읽어보시길 그냥 run,stop만 쓸줄알면된다.
+          function MarkerTracker(map:any, target:any) {
+            // 클리핑을 위한 outcode
+            var OUTCODE = {
+              INSIDE: 0, // 0b0000
+              TOP: 8, //0b1000
+              RIGHT: 2, // 0b0010
+              BOTTOM: 4, // 0b0100
+              LEFT: 1 // 0b0001
+            };
                 
-                // viewport 영역을 구하기 위한 buffer값
-                // target의 크기가 60x60 이므로 
-                // 여기서는 지도 bounds에서 상하좌우 30px의 여분을 가진 bounds를 구하기 위해 사용합니다.
-                var BOUNDS_BUFFER = 30;
+            // viewport 영역을 구하기 위한 buffer값
+            // target의 크기가 60x60 이므로 
+            // 여기서는 지도 bounds에서 상하좌우 30px의 여분을 가진 bounds를 구하기 위해 사용합니다.
+            var BOUNDS_BUFFER = 30;
                 
-                // 클리핑 알고리즘으로 tracker의 좌표를 구하기 위한 buffer값
-                // 지도 bounds를 기준으로 상하좌우 buffer값 만큼 축소한 내부 사각형을 구하게 됩니다.
-                // 그리고 그 사각형으로 target위치와 지도 중심 사이의 선을 클리핑 합니다.
-                // 여기서는 tracker의 크기를 고려하여 40px로 잡습니다.
-                var CLIP_BUFFER = 40;
+            // 클리핑 알고리즘으로 tracker의 좌표를 구하기 위한 buffer값
+            // 지도 bounds를 기준으로 상하좌우 buffer값 만큼 축소한 내부 사각형을 구하게 됩니다.
+            // 그리고 그 사각형으로 target위치와 지도 중심 사이의 선을 클리핑 합니다.
+            // 여기서는 tracker의 크기를 고려하여 40px로 잡습니다.
+            var CLIP_BUFFER = 40;
                 
-                // trakcer 엘리먼트
-                var tracker = document.createElement('div');
-                tracker.className = 'tracker';
+            // trakcer 엘리먼트
+            var tracker = document.createElement('div');
+              tracker.className = 'tracker';
                 
-                // 내부 아이콘
-                var icon = document.createElement('div');
-                icon.className = 'icon';
+            // 내부 아이콘
+            var icon = document.createElement('div');
+              icon.className = 'icon';
                 
-                // 외부에 있는 target의 위치에 따라 회전하는 말풍선 모양의 엘리먼트
-                var balloon = document.createElement('div');
-                balloon.className = 'balloon';
+            // 외부에 있는 target의 위치에 따라 회전하는 말풍선 모양의 엘리먼트
+            var balloon = document.createElement('div');
+              balloon.className = 'balloon';
                 
-                tracker.appendChild(balloon);
-                tracker.appendChild(icon);
+              tracker.appendChild(balloon);
+              tracker.appendChild(icon);
                 
-                map.getNode().appendChild(tracker);
+              map.getNode().appendChild(tracker);
+              
+              // traker를 클릭하면 target의 위치를 지도 중심으로 지정합니다.
+              tracker.onclick = function() {
+                map.setCenter(target.getPosition());
+                setVisible(false);
+              };
                 
-                // traker를 클릭하면 target의 위치를 지도 중심으로 지정합니다.
-                tracker.onclick = function() {
-                    map.setCenter(target.getPosition());
-                    setVisible(false);
-                };
-                
-                // target의 위치를 추적하는 함수
-                function tracking() {
-                    var proj = map.getProjection();
+            // target의 위치를 추적하는 함수
+            function tracking() {
+              var proj = map.getProjection();
                     
-                    // 지도의 영역을 구합니다.
-                    var bounds = map.getBounds();
+              // 지도의 영역을 구합니다.
+              var bounds = map.getBounds();
                     
-                    // 지도의 영역을 기준으로 확장된 영역을 구합니다.
-                    var extBounds = extendBounds(bounds, proj);
+              // 지도의 영역을 기준으로 확장된 영역을 구합니다.
+              var extBounds = extendBounds(bounds, proj);
                 
-                    // target이 확장된 영역에 속하는지 판단하고
-                    if (extBounds.contain(target.getPosition())) {
-                        // 속하면 tracker를 숨깁니다.
-                        setVisible(false);
-                    } else {
-                        // target이 영역 밖에 있으면 계산을 시작합니다.
+              // target이 확장된 영역에 속하는지 판단하고
+              if (extBounds.contain(target.getPosition())) {
+                // 속하면 tracker를 숨깁니다.
+                setVisible(false);
+              } else {
+                // target이 영역 밖에 있으면 계산을 시작합니다.
                         
                 
                         // 지도 bounds를 기준으로 클리핑할 top, right, bottom, left를 재계산합니다.
@@ -292,8 +271,8 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
                 
                     // 그리고나서 다시 지도 좌표로 변환한 extBounds를 리턴합니다.
                     // extBounds는 기존의 bounds에서 상하좌우 30px만큼 확장된 영역 객체입니다.  
-                    return new kakao.maps.LatLngBounds(
-                                    proj.coordsFromPoint(sw),proj.coordsFromPoint(ne));
+                    return new window.kakao.maps.LatLngBounds(
+                      proj.coordsFromPoint(sw),proj.coordsFromPoint(ne));
                     
                 }
                 
@@ -327,69 +306,65 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
                 
                     var code = calcOutcode(ox, oy);
                 
-                    while(true) {
-                        if (!code) {
-                            break;
-                        }
-                
-                        if (code & OUTCODE.TOP) {
-                            ox = ox + (ix - ox) / (iy - oy) * (top - oy);
-                            oy = top;
-                        } else if (code & OUTCODE.RIGHT) {
-                            oy = oy + (iy - oy) / (ix - ox) * (right - ox);        
-                            ox = right;
-                        } else if (code & OUTCODE.BOTTOM) {
-                            ox = ox + (ix - ox) / (iy - oy) * (bottom - oy);
-                            oy = bottom;
-                        } else if (code & OUTCODE.LEFT) {
-                            oy = oy + (iy - oy) / (ix - ox) * (left - ox);     
-                            ox = left;
-                        }
-                
-                        code = calcOutcode(ox, oy);
-                    }
-                
-                    return {x: ox, y: oy};
+              while(true) {
+                if (!code) {
+                  break;
                 }
-                
-                // 말풍선의 회전각을 구하기 위한 함수
-                // 말풍선의 anchor가 TooltipMarker가 있는 방향을 바라보도록 회전시킬 각을 구합니다.
-                function getAngle(center:any, target:any) {
-                    var dx = target.x - center.x;
-                    var dy = center.y - target.y ;
-                    var deg = Math.atan2( dy , dx ) * 180 / Math.PI; 
-                
-                    return ((-deg + 360) % 360 | 0) + 90;
+                if (code & OUTCODE.TOP) {
+                  ox = ox + (ix - ox) / (iy - oy) * (top - oy);
+                  oy = top;
+                } else if (code & OUTCODE.RIGHT) {
+                  oy = oy + (iy - oy) / (ix - ox) * (right - ox);        
+                  ox = right;
+                } else if (code & OUTCODE.BOTTOM) {
+                  ox = ox + (ix - ox) / (iy - oy) * (bottom - oy);
+                  oy = bottom;
+                } else if (code & OUTCODE.LEFT) {
+                  oy = oy + (iy - oy) / (ix - ox) * (left - ox);     
+                  ox = left;
                 }
+                code = calcOutcode(ox, oy);
+              }
+              return {x: ox, y: oy};
+            }
                 
-                // tracker의 보임/숨김을 지정하는 함수
-                function setVisible(visible:any) {
-                    tracker.style.display = visible ? 'block' : 'none';
-                }
+            // 말풍선의 회전각을 구하기 위한 함수
+            // 말풍선의 anchor가 TooltipMarker가 있는 방향을 바라보도록 회전시킬 각을 구합니다.
+            function getAngle(center:any, target:any) {
+              var dx = target.x - center.x;
+              var dy = center.y - target.y ;
+              var deg = Math.atan2( dy , dx ) * 180 / Math.PI; 
                 
-                // Map 객체의 'zoom_start' 이벤트 핸들러
-                function hideTracker() {
-                    setVisible(false);
-                }
+              return ((-deg + 360) % 360 | 0) + 90;
+            }
                 
-                // target의 추적을 실행합니다.
-                this.run = function() {
-                    kakao.maps.event.addListener(map, 'zoom_start', hideTracker);
-                    kakao.maps.event.addListener(map, 'zoom_changed', tracking);
-                    kakao.maps.event.addListener(map, 'center_changed', tracking);
-                    tracking();
-                };
+            // tracker의 보임/숨김을 지정하는 함수
+            function setVisible(visible:any) {
+              tracker.style.display = visible ? 'block' : 'none';
+            }
                 
-                // target의 추적을 중지합니다.
-                this.stop = function() {
-                    kakao.maps.event.removeListener(map, 'zoom_start', hideTracker);
-                    kakao.maps.event.removeListener(map, 'zoom_changed', tracking);
-                    kakao.maps.event.removeListener(map, 'center_changed', tracking);
-                    setVisible(false);
-                };
+            // Map 객체의 'zoom_start' 이벤트 핸들러
+            function hideTracker() {
+              setVisible(false);
+            }
+                
+            // target의 추적을 실행합니다.
+            this.run = function() {
+              window.kakao.maps.event.addListener(map, 'zoom_start', hideTracker);
+              window.kakao.maps.event.addListener(map, 'zoom_changed', tracking);
+              window.kakao.maps.event.addListener(map, 'center_changed', tracking);
+              tracking();
+            };
+                
+            // target의 추적을 중지합니다.
+            this.stop = function() {
+                window.kakao.maps.event.removeListener(map, 'zoom_start', hideTracker);
+                window.kakao.maps.event.removeListener(map, 'zoom_changed', tracking);
+                window.kakao.maps.event.removeListener(map, 'center_changed', tracking);
+                setVisible(false);
+            };
           }
 
- 
       
             var place_data:Place_Data;
       
