@@ -4,7 +4,7 @@ import React ,{ useEffect } from 'react';
 
 const KakaoCallback: React.FC = () => {
  const code=useSearchParams();
- const BACKEND_URL = "http://ec2-15-164-104-176.ap-northeast-2.compute.amazonaws.com:8080/reqlogin";
+ const BACKEND_URL =process.env.NEXT_PUBLIC_BACK_END_URL;
  const router=useRouter();
   useEffect(() => {
     console.log("code:",code.get("code").substring(1))

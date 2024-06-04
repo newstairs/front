@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import '../../styles/overlayContainer.css';
+import '../../../styles/overlayContainer.css';
 
 interface allItem {
   productId: number;
@@ -8,10 +8,10 @@ interface allItem {
 }
 
 const MainList: React.FC = () => {
- const [allItems, setAllItems] = useState<allItem[]>([]);
+  const [allItems, setAllItems] = useState<allItem[]>([]);
 
 
-   useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch('http://ec2-15-164-104-176.ap-northeast-2.compute.amazonaws.com:8080/products',{
