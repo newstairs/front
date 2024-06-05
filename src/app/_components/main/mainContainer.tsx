@@ -12,8 +12,23 @@ const MainContainer: React.FC = () => {
   //const [location, setLocation] = useState<{ lat: number; lng: number }>({ lat: 33.450701, lng: 126.570667 });
   const [location, setLocation] =  useState<{ datas:string[] }>({datas:["KB국민은행 상계역지점","IBK기업은행365 중계주공3단지아파트","코리아세븐 세븐-중계2호 ATM"]})//useState<{ lat: number; lng: number }>({ lat: 33.450701, lng: 126.570667 });
   const [kakaoLoaded, setKakaoLoaded] = useState(false);
+  const [dayCheck,setDayCheck]=useState(false);
 
+  const day_mem=()=>{
+    const now=new Date();
+    localStorage.setItem("day_check",JSON.stringify(24*60**60*1000+now.getTime()));
+    setDayCheck(true);
+  }
+  const just_close=()=>{
+    setDayCheck(true);
+  }
   useEffect(() => {
+
+    const now=new Date();
+    JSON.parse(localStorage.getItem("day_check"))>now.getTime() ? setDayCheck(true):setDayCheck(false);
+
+
+
     const script = document.createElement('script');
     script.async = true;
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${process.env.NEXT_PUBLIC_JAVASCRIPT_API_KEY}&libraries=services`;
@@ -54,6 +69,12 @@ const MainContainer: React.FC = () => {
   return (
     <div className="flex pt-14">
       <Header onLocationChange={handleLocationChange} onItemSelected={setActiveIndex} />
+      {!dayCheck &&
+        <div className="w-[300px] h-[300px] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white z-50">
+          <input type="checkbox" onClick={()=>day_mem()}/>
+          <button onClick={()=>just_close()} className="w-[50px] h-[50px] bg-slate-100">x</button>
+          Hello
+        </div>}
       <div className=" flex flex-1">
         <div className="flex-1">
           <Map location={location}/>

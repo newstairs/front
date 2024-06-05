@@ -8,15 +8,81 @@ interface allItem {
   productName: string;
 }
 
+
+interface allItem2 {
+  productId: number;
+  productImgUrl: string;
+  productName: string;
+  quantity:number;
+}
+
+//http://ec2-15-164-104-176.ap-northeast-2.compute.amazonaws.com:8080/products?page=${currentPage - 1}&size=11
 const MainList: React.FC = () => {
   const [allItems, setAllItems] = useState<allItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1); // 페이지 번호 상태 추가
   const [totalPages] = useState(9); // 총 페이지 수
 
+  //로컬 스토리지에 사용자가 택한 아이템들을 추가하는 과정.
+  const AddToLocalStorage=(itemid:number,itemimgurl:string,itemname:string)=>{
+      if(JSON.parse(localStorage.getItem("Item_Chosen"))===null){
+        const product_list:allItem2[]=[{
+          productId:itemid,
+          productImgUrl:itemimgurl,
+          productName:itemname,
+          quantity:0
+        }]
+        localStorage.setItem("Item_Chosen",JSON.stringify(product_list))
+      }
+      else{
+
+        let product_list:allItem2[]=JSON.parse(localStorage.getItem("Item_Chosen"));
+        const data:allItem2={
+          productId:itemid,
+          productImgUrl:itemimgurl,
+          productName:itemname,
+          quantity:0
+        }
+        let data_list=product_list.filter(x=>{
+          if(x.productId===itemid){
+            return true;
+          }
+          return false;
+        })
+
+
+        if(data_list.length===0){
+          product_list.push(data);
+          localStorage.setItem("Item_Chosen",JSON.stringify(product_list));
+        }
+
+
+       
+      }    
+  }
+
+
+  //fetch문으로 가져와서 백엔드에다가 데이터를 넣는과정.
+  const add_to_cartlist=async(itemid:number,itemimgurl:string,itemname:string)=>{
+
+      const data=await fetch("http://localhost:3000/cart",{
+        method:"POST",
+        headers:{
+          Authorization:localStorage.getItem("token")
+        },
+        body:JSON.stringify({
+          productId:itemid
+        })
+        })
+      .then((res)=>{return res.json();})
+      //fetch문으로 나의 카트리스트에다가 데이터를 채우는 과정.
+  }
+  
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://ec2-15-164-104-176.ap-northeast-2.compute.amazonaws.com:8080/products?page=${currentPage - 1}&size=11`,{
+        const response = await fetch(`http://localhost:3000/products?page=${currentPage-1}&size=11`,{
           headers: {
             'Content-Type': 'application/json'
           }
@@ -61,7 +127,7 @@ return (
             <div className="flex flex-row items-center justify-between w-full">
               <img src={item.productImgUrl} alt={item.productName} className="h-10 w-10 object-cover mb-2" />
               <div className="text-center text-white mb-2 mx-4">{item.productName}</div>
-              <button type="button" className="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-500 dark:focus:ring-blue-800">
+              <button onClick={()=>{AddToLocalStorage(item.productId,item.productImgUrl,item.productName)}}type="button" className="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-500 dark:focus:ring-blue-800">
                 추가
               </button>
             </div>
