@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Pagination from '../../pagination';
 import '../../../styles/overlayContainer.css';
 
 interface allItem {
@@ -9,12 +10,13 @@ interface allItem {
 
 const MainList: React.FC = () => {
   const [allItems, setAllItems] = useState<allItem[]>([]);
-
+  const [currentPage, setCurrentPage] = useState(1); // 페이지 번호 상태 추가
+  const [totalPages] = useState(9); // 총 페이지 수
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://ec2-15-164-104-176.ap-northeast-2.compute.amazonaws.com:8080/products',{
+        const response = await fetch(`http://ec2-15-164-104-176.ap-northeast-2.compute.amazonaws.com:8080/products?page=${currentPage - 1}&size=11`,{
           headers: {
             'Content-Type': 'application/json'
           }
@@ -28,8 +30,11 @@ const MainList: React.FC = () => {
     };
 
     fetchData();  // fetchData 함수 실행
-  }, []);
+  }, [currentPage]);
 
+    const handlePageChange = (page: number) => {
+    setCurrentPage(page); // 페이지 변경 처리
+  };
 return (
   <div className="list-container bg-transparent">
     <div>
@@ -63,6 +68,9 @@ return (
           </li>
         ))}
       </ul>
+        <div className="flex justify-center w-full p-1">
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+        </div>
     </div>
   </div>
 );
