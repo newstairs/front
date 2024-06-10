@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../../../styles/overlayContainer.css';
 import Map from "../map/Map";
-
+import FriendList from "./friendlist";
 
 interface CartItem {
   productId: number;
@@ -9,11 +9,19 @@ interface CartItem {
   productName: string; // 상품명
   quantity: number; // 초기 수량
 }
+interface friend_data{
+  uuid:string,
+  name:string
+}
+interface friend_data_list{
+  friend_datas:friend_data[]
+}
 
 const CartList: React.FC = () => {
 
   const [isopen,setisopen]= useState(()=>{});
   const [hasitems,sethasitems]=useState(false);
+  const [friendlist,setfriendlist]=useState<friend_data_list>();
  /* const [cartItems, setCartItems] = useState<CartItem[]>([
     { productId: 1, productImgUrl: '/path/to/image.jpg', productName: '사과',  quantity: 1 },
     { productId: 2, productImgUrl: '/path/to/image.jpg', productName: '오렌지 주스',  quantity: 2 },
@@ -84,7 +92,7 @@ const CartList: React.FC = () => {
   };*/
   const [location, setLocation] =useState<{ datas:string[] }>(null);
   //useState<{ lat: number; lng: number}> ({lat: 33.450701, lng: 126.570667 });
- 
+ const [friend_onoff,setfriend]=useState(false);
   const clicketst=()=>{
     //setLocation({lat,lng})
     setLocation({datas:["KB국민은행 상계역지점","IBK기업은행365 중계주공3단지아파트"]})
@@ -106,7 +114,7 @@ const CartList: React.FC = () => {
 
   }
 
-
+  let friend_data;
 
   const delete_item_by_one=async (itemid:number)=>{
     const data=await fetch(`http://localhost:3000/cart/${itemid}`,{
@@ -145,7 +153,44 @@ const CartList: React.FC = () => {
       console.log("error:",data.message);
     }
   }
+  const getfrienddata=async ()=>{
+    
+   if(friend_onoff===false){
+    
 
+    let datas= await fetch("http://localhost:3000/returnfriendlist",{
+      method:'GET',
+      headers:{
+        Authorization:"Bearer "+localStorage.getItem("access_token")
+      }
+    }).then((res)=>{return res.json();})
+    console.log(datas);
+    friend_data=datas.data.elements.map((x)=>{
+      return {
+        uuid:x.uuid,
+        name:x.profile_nickname
+      }
+    })
+    console.log(friend_data);
+    setfriendlist({friend_datas:friend_data})
+    setfriend(true)
+    const data=await fetch("http://localhost:3000/cart",{
+      method:"GET",
+      headers:{
+        Authorization:"Bearer "+localStorage.getItem("access_token")
+      }
+    }).then((res)=>{return res.json();})
+    console.log("useeffect:",data);
+    setItem(data.data);
+  
+  
+  }
+   else{
+    setfriend(false);
+   }
+
+
+  }
   
 
   //추후에 api에서 받아올떄를 가정한애
@@ -164,6 +209,7 @@ const CartList: React.FC = () => {
 
       data.data.length>0 ? sethasitems(true):sethasitems(false)
       console.log("items:",hasitems);
+
     }
 
 
@@ -178,6 +224,12 @@ const CartList: React.FC = () => {
   <div className="list-container bg-transparent">
       <svg className="h-8 w-8 text-slate-500 toggle-icon"  width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" d="M0 0h24v24H0z"/>  <polyline points="7 7 12 12 7 17" />  <polyline points="13 7 18 12 13 17" /></svg>
     <div className="overlay-container">
+     
+    <button onClick={()=>{getfrienddata()}}>친구에게 보내기</button>
+     
+    { friend_onoff&&<FriendList frienddata={friendlist} item_list={items}/>
+      }
+    
       { hasitems ?(
                    <ul className="flex flex-col items-center divide-y divide-gray-200">
 
@@ -203,6 +255,7 @@ const CartList: React.FC = () => {
         
                     
         }
+        
         <button onClick={()=>clicketst()}>hello? {location!==null &&<Map location={location}/>}</button>
     </div>
 

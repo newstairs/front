@@ -19,8 +19,9 @@ const KakaoCallback: React.FC = () => {
           body: JSON.stringify({ access_code: code.get("code") })
         })
         .then((res)=>{return res.json();})
+        
         localStorage.setItem('access_token',response.data);
-        console.log("성공:",typeof(response.data));
+        console.log("성공:",response);
         
         // 로그인 성공 시 리디렉션
         setTimeout(() => {

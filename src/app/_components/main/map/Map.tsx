@@ -1,6 +1,7 @@
 'use client';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef ,useState} from 'react';
 import '../../../styles/mapmarker.css'
+import { text } from 'stream/consumers';
 
 
 interface Location {
@@ -71,25 +72,52 @@ interface Location {
 interface MapProps {
   location: Location;
 }
+interface GridCoordinates {
+    lat: number;
+    lng: number;
+    x: number;
+    y: number;
+  }
+
+  interface router{
+    geometry:{type:string,coordinates:number[][]},
+    properties:any,    
+    type:string
+  }
+
 
 const KakaoMap: React.FC<MapProps> = ({ location }) => {
   const kakao_map_api_key = process.env.NEXT_PUBLIC_JS_KEY;
   // @ts-ignore
   const mapRef = useRef<kakao.maps.Map | null>(null);
-  
 
   var place_finded=new Map();//polyline 데이터 저장.
   var marker_save_map:Map<string,any>=new Map();//marker랑 place 데이터 저장
   var overlay_save_map:Map<string,any>=new Map();//오버레이 데이터 저장.
   var marker_tracker_map:Map<>=new Map();//마커트래커 저장.
   var marker_function_save_map:Map<any,any>=new Map();//마커에 등록된 이벤트 지울떄 쓰는 함수.
+  const [zoom,setzoom]=useState(true);
+  const closeandopen=()=>{
+    const btn=document.getElementById("closeopenbtn");
+    const x=document.getElementById("weather_bar");
+    if(btn.textContent=="close"){
+            x.className="flex justify-evenly w-full h-[50px] absolute top-0 bg-slate-100 z-40 hidden";
+            btn.textContent="open";
+            btn.className="w-[50px] h-[50px] bg-red-100 absolute top-0 right-0 z-50"
+    }
+    else{
+       
+        btn.textContent="close";
+        x.className="flex justify-evenly w-full h-[50px] absolute top-0 bg-slate-100 z-40"
+        btn.className="w-[50px] h-[50px] bg-red-100 absolute top-[50px] right-0 z-50"
 
+    }
 
+}
 
-
+  const area_mart_name=[];
   useEffect(() => {
-    console.log("useeffect1");
-    console.log("location:",location);
+    
     // Kakao Maps 스크립트 동적 로드
     const script = document.createElement('script');
     script.async = true;
@@ -101,9 +129,8 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
 
       if (typeof window.kakao !== 'undefined') {
         window.kakao.maps.load(() => {
-
-          //애는 트레커 만드느 함수인대... 읽어보고싶다면 읽어보시길 그냥 run,stop만 쓸줄알면된다.
-          function MarkerTracker(map:any, target:any) {
+            //애는 트레커 만드느 함수인대... 읽어보고싶다면 읽어보시길 그냥 run,stop만 쓸줄알면된다.
+            function MarkerTracker(map:any, target:any) {
             // 클리핑을 위한 outcode
             var OUTCODE = {
               INSIDE: 0, // 0b0000
@@ -363,7 +390,7 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
                 window.kakao.maps.event.removeListener(map, 'center_changed', tracking);
                 setVisible(false);
             };
-          }
+            }
 
       
             var place_data:Place_Data;
@@ -396,29 +423,24 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
             })
             console.log("지역이름:",data);
             }
-      
-        
             async function getbycategory(x:number,y:number){
-            const data=await fetch(`https://dapi.kakao.com/v2/local/search/category.json?category\_group\_code=BK9&x=${x}&y=${y}&radius=300`,{
+            const data=await fetch(`https://dapi.kakao.com/v2/local/search/category.json?category\_group\_code=MT1&x=${x}&y=${y}&radius=1000`,{
                 method:"GET",
                 headers:{
                     Authorization:`KakaoAK ${process.env.NEXT_PUBLIC_REST_API_KEY}`
                 }
             })
+            //BK9
             .then((res)=>{
               return res.json();
             })
             console.log("category:",data);
-
+            /*for(const x of data){
+                area_mart_name.push({martName:x.road_address_name,address:x.place_name});
+            }*/
             return data;
             }
-
-    
-
-
             var geocoder = new window.kakao.maps.services.Geocoder();// 주소 찾기용.
-
-                
             var weather_area_code={
               "109":"서울,인천,경기",
               "159":"부산,울산,경남",
@@ -429,27 +451,7 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
               "131":"충북",
               "105":"강원"
             }
-      
-            var origin_cord:string[];//사용자가 입력한 주소의 실제 위도 경도값을 말함.
-        
-          
-            interface GridCoordinates {
-              lat: number;
-              lng: number;
-              x: number;
-              y: number;
-            }
-      
-            interface router{
-              geometry:{type:string,coordinates:number[][]},
-              properties:any,    
-              type:string
-            }
-      
-      
-      
-      
-      
+            var origin_cord:string[];//사용자가 입력한 주소의 실제 위도 경도값을 말함
             //기상청 api가 요구하는 좌표값으로 바꾸는 함수.
             function convertposition(v1:string,v2:string):GridCoordinates{
               var RE = 6371.00877; // 지구 반경(km)
@@ -502,8 +504,6 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
               return rs;
       
             }
-      
-      
             //기상청 api데이터 조회시 어떤 시각을 기준으로 조회할지 결정하는애.--->단기 현황 api에쓰는것.
             function makedate(date:Date):string[]{
               var month=""+(date.getMonth()+1);
@@ -547,8 +547,7 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
       
               
       
-            }
-        
+            }        
             function makeareacode(name:string){
               switch(name){
                   case "서울":
@@ -647,9 +646,6 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
       
               return min+":"+second;
             }
-      
-      
-      
             var container = document.getElementById('map');//map을 띄우기 위한 칸을 의미한다.
             var options={
             center: new window.kakao.maps.LatLng(33.450701, 126.570667),
@@ -659,11 +655,26 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
             var map= new window.kakao.maps.Map(container, options);//container로 정의된 div태그에 맵을 띄운다. 그와동시에 map이라느 변수로 받아서 
             //활용할수있게한다.
 
+  
+            let zoom_map=document.getElementById("map_zoom");
+            zoom_map.addEventListener("click",()=>{
 
+                setzoom(zoom=>{
+                    const newzoom=!zoom;
+                    map.setZoomable(newzoom);
+                    if(newzoom!==true){
+                        zoom_map.textContent="줌 꺼짐";
+    
+                    }
+                    else{
+                        zoom_map.textContent="줌 켜짐"
+                    }
 
-            var ps = new window.kakao.maps.services.Places(map); 
-      
-      
+                    return newzoom;
+                })
+                
+               
+            })
             function getLocation() {
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(showPosition);
@@ -681,7 +692,7 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
                     center: new window.kakao.maps.LatLng(37.654733159968,127.07610170472),
                     level: 3
             };
-            console.log("위도,경도:",latitude,longitude);
+           
               map=new window.kakao.maps.Map(container, options);        
               //origin_cord=[latitude.toString(),longitude.toString()];
               origin_cord=["37.654733159968","127.07610170472"]
@@ -689,394 +700,226 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
       
               async1();
             
-          }
-      
-          /*window.addEventListener("load",()=>{
-              getLocation();
-              console.log("로딩완료.")
-          })*/
-      
+            } 
             async function async1(){
-                console.log("Async1");
-              /*var callbacks =function(result:any, status:any) {
-                console.log("callback");
-                  if (status === kakao.maps.services.Status.OK) {
-                      
-                    console.log(result);
-                      origin_name=result[0].address.address_name;
-                      console.log("address_name:",result[0].address.address_name);
-      
-                      getmarker(origin_name);
-      
-      
-                
-                  }
-              };*/
+                console.log("Async1");         
+                async function getmarker(origin_name:string){
+                    
+                let serviceKey=process.env.NEXT_PUBLIC_serviceKey;
+                let date=new Date();
+          
+                var datearr=makedate(date)
+          
+               
+                marker_save_map.clear();
+                place_finded.clear();
+                overlay_save_map.clear();
+              
+                for(const x of marker_tracker_map.values()){
+                    x.stop();
+                }
 
+                marker_tracker_map.clear();
+                
+                //중간의 clear문과 stop의 경우 기존에 저장된 마커,polyline,overlay등을 지도에서 표시하는걸 취소하고 map을 비우기 위함이다.
+
+
+
+                place_data=await getbycategory(Number(origin_cord[1]),Number(origin_cord[0]));
+                /*const mart_data=place_data.documents.map((x)=>{
+                   return {
+                        martName:x.place_name,
+                        martAddress:x.road_address_name
+                    }
+                })*/
+                //console.log("mart_around:",mart_data);
+                const mart_data=place_data.documents[0];
+                console.log("mart_around:",mart_data);
+                //localStorage.setItem("mart_around",JSON.stringify(mart_data));
+                let answer=await fetch("http://localhost:3000/marts",{
+                    method:'POST',
+                    headers:{
+                        "Content-Type":"application/json",
+                        Authorization:"Bearer "+localStorage.getItem("access_token")
+                    },
+                    body:JSON.stringify([{martName:mart_data.place_name,
+                        martAddress:mart_data.road_address_name}]
+                    )
+                    
+                })
+                .then((res)=>{return res.json()})
+                localStorage.setItem("mart_around",JSON.stringify(answer.data));
+                console.log("ans:",answer);
+                console.log("place_Data:",place_data);
+              
+            
+                let stnId:string="";
+                var weatherdata={}
+                var weather_local_data={}
+                
+              
+                console.log("place_Data:",place_data);
+
+                var rs=convertposition(origin_cord[0],origin_cord[1]);
+                let nx=rs.x;
+                let ny=rs.y;     
+
+                let url=` http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?serviceKey=${serviceKey}&pageNo=1&numOfRows=10&base_date=${datearr[0]}&base_time=${datearr[1]}&dataType=JSON&nx=${nx}&ny=${ny}`; 
+          
+                var option={
+                        method:"GET"
+                    }
+                data=await fetch(url,option)
+                    .then((result)=>{
+                    return result.json();
+                    })
 
               
-              //geocoder.coord2Address(Number(origin_cord[1]),Number(origin_cord[0]),callbacks);
+
+
+                for(const x of data.response.body.items.item){
+                    switch(x.category){
+                        case "T1H":
+                            weather_local_data["T1H"]=x.obsrValue ;
+                            break;
+                        case "PTY":
+                                    weather_local_data["PTY"]=x.obsrValue;
+                                    break;
+                                case "RN1":
+                                    weather_local_data["RN1"]=x.obsrValue;
+                                    break;
+                                case 'VEC':
+                                    weather_local_data["VEC"]=x.obsrValue;
+                                    break;
+                                default :
+                                break;
+
+                            }
+                    }
+               
+
+
+                let fromTmFc=datearr[0];
+                let toTmFc=datearr[0];
+              
+                let area_name=place_data["documents"][0]["address_name"].substring(0,2);                    
+
+
+
+
+                stnId=getstnid(area_name);
+                var data=await fetch(`http://apis.data.go.kr/1360000/WthrWrnInfoService/getWthrWrnList?serviceKey=${serviceKey}&numOfRows=10&pageNo=1&dataType=JSON&fromTmFc=${fromTmFc}&toTmFc=${toTmFc}&stnId=${stnId}`,option)
+                        .then((res)=>{
+                        return res.json();
+                        }
+                        )
+
+                
+                try{
+                    var strs=data.response.body.items.item[0].title;
+                    var arr=strs.split(" ");
+                    weatherdata["특보데이터"]=""
+                    for(const x of arr){
+                        if(x.includes("주의보")){
+                            weatherdata["특보데이터"]+=x;
+                        }
+                    }
+                }
+                catch(error){
+                    weatherdata["특보데이터"]=null;
+                    console.log("기상특보가 없음!");
+                }
+                        
+                finally{
+                    
+                    for (var i=0; i<place_data["documents"].length; i++) {
+                       
+                        displayMarker(place_data["documents"][i]);    
+                        }      
+                } 
+                    
+
+                if(weatherdata["특보데이터"]===null){
+                    console.log("특보가 업성요")
+                }
+                else{
+                    console.log(weatherdata["특보데이터"]);
+                    console.log(weather_local_data);
+                    console.log("현재"+weather_area_code[stnId]+"지역에"+weatherdata["특보데이터"]+"가 발생했어요");
+                }
+
+                
+                for(const local_data of Object.keys(weather_local_data)){
+                        switch (local_data){
+                            case "PTY":
+                                console.log("강수유형");
+                             
+                                break;
+                            case "RN1":
+                                console.log("강수량:",weather_local_data[local_data]);
+                                const doc1=document.getElementById(local_data)
+
+                                let textNode = document.createElement("span");
+                                textNode.textContent=(weather_local_data[local_data]+"mm");
+                                textNode.className="inline";
+                                doc1.appendChild(textNode);
+                                break;
+                            case "T1H":
+                                console.log("현재기온:",weather_local_data[local_data]);
+
+                                let textNode2 = document.createElement("span");
+                                textNode2.textContent=(weather_local_data[local_data]+"°C");
+                                textNode2.className="inline";
+                                const doc2=document.getElementById(local_data)
+                                doc2.appendChild(textNode2)
+                                break;
+                            case "VEC":
+                                console.log("풍속:",weather_local_data[local_data]);
+
+                                let textNode3= document.createElement("span");
+                                textNode3.textContent=(weather_local_data[local_data]+"m/s");
+                                textNode3.className="inline";
+                                const doc3=document.getElementById(local_data)
+                                doc3.appendChild(textNode3);
+                                break;
+                        }
+                }
+
+
+                    
+              
+
+                
+
+      
+                //place_data로부터 좌표를 불러와서 해당 좌표에 마커를 만드는과정.
+                function displayMarker(place:any) {
+                    console.log("displaydata:",place);
+                    var marker = new window.kakao.maps.Marker({
+                        map: map,
+                        position: new window.kakao.maps.LatLng(place.y, place.x) 
+                    });
+  
+                    marker_save_map.set(place.place_name,[marker,place]);
+                    //marker_save_map에다가 장소명을 기준으로 마커,place_data를 저장한다.   
+
+
+                }
+
+
+
+                //weatherdata로 놀공간.
+
+                console.log("geocoder end");
+
+              
+            
+                }
                 origin_name=await convertcoordtoname(Number(origin_cord[1]),Number(origin_cord[0]));
                 getmarker(origin_name);
 
 
-                async function getmarker(origin_name:string){
-                    
-                    let serviceKey=process.env.NEXT_PUBLIC_serviceKey;
-                    let date=new Date();
-              
-                    var datearr=makedate(date)
-              
-                    //callback함수는 아래의 gecoder의 serach에서 쓰이는 callback을 정의한다.
-                    /*var callback =function(result:any, status:any) {
-                    
-                    if (status === kakao.maps.services.Status.OK) {
-                        console.log("callback!");
-                        
-        
-                        marker_save_map.clear();
-                        place_finded.clear();
-                        overlay_save_map.clear();
-                        console.log("result:",result);
-                        for(const x of marker_tracker_map.values()){
-                            x.stop();
-                        }
-        
-                        marker_tracker_map.clear();
-                        
-                        //중간의 clear문과 stop의 경우 기존에 저장된 마커,polyline,overlay등을 지도에서 표시하는걸 취소하고 map을 비우기 위함이다.
-        
-        
-                        var ps = new kakao.maps.services.Places(map); 
-        
-        
-              
-                        ps.categorySearch('BK9', placesSearchCB, {useMapCenter:true,
-                            radius:500});
-                            //반경 500 내에서 카테고리가 은행인 애들 찾는것. 
-        
-                        //반경 500내에서 카테고리가 은행인 애들찾기에 쓰이는 콜백함수이다.
-                        async function placesSearchCB (data:any, status:any, pagination:any) {
-                          console.log("placesearchcb");
-                            let stnId:string="";
-                            var weatherdata={}
-                            var weather_local_data={}
-                            if (status === kakao.maps.services.Status.OK) {
-                                place_data=data;
-                                var rs=convertposition(origin_cord[0],origin_cord[1]);
-                                let nx=rs.x;
-                                let ny=rs.y;     
-                                console.log(nx,ny);
-                                console.log("datearr:",datearr)
-                                let url=` http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?serviceKey=${serviceKey}&pageNo=1&numOfRows=10&base_date=${datearr[0]}&base_time=${datearr[1]}&dataType=JSON&nx=${nx}&ny=${ny}`; 
-                  
-                                var option={
-                                        method:"GET"
-                                }
-                                data=await fetch(url,option)
-                                    .then((result)=>{
-                                    return result.json();
-                                })
-        
-                                console.log("weather:",data);
-        
-        
-                                for(const x of data.response.body.items.item){
-                                    switch(x.category){
-                                        case "T1H":
-                                            weather_local_data["T1H"]=x.obsrValue ;
-                                            break;
-                                        case "PTY":
-                                            weather_local_data["PTY"]=x.obsrValue;
-                                            break;
-                                        case "RN1":
-                                            weather_local_data["RN1"]=x.obsrValue;
-                                            break;
-                                        case 'VEC':
-                                            weather_local_data["VEC"]=x.obsrValue;
-                                            break;
-                                        default :
-                                        break;
-        
-                                    }
-                                }
-                                console.log(weatherdata);
-        
-        
-                                let fromTmFc=datearr[0];
-                                let toTmFc=datearr[0];
-                                console.log(fromTmFc,toTmFc);
-                                let area_name=place_data[0]["address_name"].substring(0,2);                    
-                                console.log("areaname:",area_name);
-                                console.log(place_data[0]["address_name"]);
-        
-        
-        
-                                stnId=getstnid(area_name);
-                                console.log(weather_area_code[stnId]);
-                                var data=await fetch(`http://apis.data.go.kr/1360000/WthrWrnInfoService/getWthrWrnList?serviceKey=${serviceKey}&numOfRows=10&pageNo=1&dataType=JSON&fromTmFc=${fromTmFc}&toTmFc=${toTmFc}&stnId=${stnId}`,option)
-                                        .then((res)=>{
-                                        return res.json();
-                                        }
-                                    )
-        
-                                console.log("data:",data);
-                                try{
-                                    var strs=data.response.body.items.item[0].title;
-                                    var arr=strs.split(" ");
-                                    console.log(arr);
-                                    weatherdata["특보데이터"]=""
-                                    for(const x of arr){
-                                        if(x.includes("주의보")){
-                                        weatherdata["특보데이터"]+=x;
-                                        }
-                                    }
-                                }
-                                catch(error){
-                                    weatherdata["특보데이터"]=null;
-                                    console.log("기상특보가 없음!");
-                                }
-      
-                                finally{
-                                    console.log("place_data:",place_data);
-                                    for (var i=0; i<place_data.length; i++) {
-                                        displayMarker(place_data[i]);    
-                                    }      
-                                } 
-                            }
-        
-                            if(weatherdata["특보데이터"]===null){
-                                console.log("특보가 업성요")
-                            }
-                            else{
-                                console.log(weatherdata["특보데이터"]);
-                                console.log(weather_local_data);
-                                console.log("현재"+weather_area_code[stnId]+"지역에"+weatherdata["특보데이터"]+"가 발생했어요");
-                            }
-        
-                        
-                            for(const local_data of Object.keys(weather_local_data)){
-                                switch (local_data){
-                                    case "PTY":
-                                        console.log("강수유형");
-                                        break;
-                                    case "RN1":
-                                        console.log("강수량:",weather_local_data[local_data]);
-                                        break;
-                                    case "T1H":
-                                        console.log("현재기온:",weather_local_data[local_data]);
-                                        break;
-                                    case "VEC":
-                                        console.log("풍속:",weather_local_data[local_data]);
-                                }
-                            }
-        
-        
-                            console.log("marker_Save_mape:",marker_save_map);
-                            
-                            async2()
-        
-                        }
-        
-              
-                        //place_data로부터 좌표를 불러와서 해당 좌표에 마커를 만드는과정.
-                        function displayMarker(place:any) {
-                            var marker = new kakao.maps.Marker({
-                                map: map,
-                                position: new kakao.maps.LatLng(place.y, place.x) 
-                            });
-          
-                            marker_save_map.set(place.place_name,[marker,place]);
-                            //marker_save_map에다가 장소명을 기준으로 마커,place_data를 저장한다.   
-        
-        
-                        }
-        
-        
-        
-                        //weatherdata로 놀공간.
-        
-        
-        
-        
-        
-                    }
                 
-            
-                    }*/
-                    console.log("origin_name:",origin_name);
-
-
-                
-                    //geocoder.addressSearch(origin_name, callback);
-
-                    console.log("callback!");
-                    
-    
-                    marker_save_map.clear();
-                    place_finded.clear();
-                    overlay_save_map.clear();
-                    //console.log("result:",result);
-                    for(const x of marker_tracker_map.values()){
-                        x.stop();
-                    }
-    
-                    marker_tracker_map.clear();
-                    
-                    //중간의 clear문과 stop의 경우 기존에 저장된 마커,polyline,overlay등을 지도에서 표시하는걸 취소하고 map을 비우기 위함이다.
-    
-
-
-
-    
-                    //var ps = new kakao.maps.services.Places(map); 
-    
-                    place_data=await getbycategory(Number(origin_cord[1]),Number(origin_cord[0]));
-
-                  
-                    let stnId:string="";
-                    var weatherdata={}
-                    var weather_local_data={}
-                    
-                  
-                    console.log("place_Data:",place_data);
-                    var rs=convertposition(origin_cord[0],origin_cord[1]);
-                    let nx=rs.x;
-                    let ny=rs.y;     
-  
-                    let url=` http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?serviceKey=${serviceKey}&pageNo=1&numOfRows=10&base_date=${datearr[0]}&base_time=${datearr[1]}&dataType=JSON&nx=${nx}&ny=${ny}`; 
-              
-                    var option={
-                            method:"GET"
-                        }
-                    data=await fetch(url,option)
-                        .then((result)=>{
-                        return result.json();
-                        })
-    
-                  
-    
-    
-                    for(const x of data.response.body.items.item){
-                        switch(x.category){
-                            case "T1H":
-                                weather_local_data["T1H"]=x.obsrValue ;
-                                break;
-                            case "PTY":
-                                        weather_local_data["PTY"]=x.obsrValue;
-                                        break;
-                                    case "RN1":
-                                        weather_local_data["RN1"]=x.obsrValue;
-                                        break;
-                                    case 'VEC':
-                                        weather_local_data["VEC"]=x.obsrValue;
-                                        break;
-                                    default :
-                                    break;
-    
-                                }
-                        }
-                    console.log(weatherdata);
-    
-    
-                    let fromTmFc=datearr[0];
-                    let toTmFc=datearr[0];
-                  
-                    let area_name=place_data["documents"][0]["address_name"].substring(0,2);                    
-
-    
-    
-    
-                    stnId=getstnid(area_name);
-                    var data=await fetch(`http://apis.data.go.kr/1360000/WthrWrnInfoService/getWthrWrnList?serviceKey=${serviceKey}&numOfRows=10&pageNo=1&dataType=JSON&fromTmFc=${fromTmFc}&toTmFc=${toTmFc}&stnId=${stnId}`,option)
-                            .then((res)=>{
-                            return res.json();
-                            }
-                            )
-    
-                    
-                    try{
-                                var strs=data.response.body.items.item[0].title;
-                                var arr=strs.split(" ");
-                                console.log(arr);
-                                weatherdata["특보데이터"]=""
-                                for(const x of arr){
-                                    if(x.includes("주의보")){
-                                    weatherdata["특보데이터"]+=x;
-                                    }
-                                }
-                    }
-                    catch(error){
-                        weatherdata["특보데이터"]=null;
-                        console.log("기상특보가 없음!");
-                    }
-                            
-                    finally{
-                        console.log("place_data:",place_data);
-                        for (var i=0; i<place_data["documents"].length; i++) {
-                            console.log("displaying");
-                            displayMarker(place_data["documents"][i]);    
-                            }      
-                    } 
-                        
-    
-                    if(weatherdata["특보데이터"]===null){
-                        console.log("특보가 업성요")
-                    }
-                    else{
-                        console.log(weatherdata["특보데이터"]);
-                        console.log(weather_local_data);
-                        console.log("현재"+weather_area_code[stnId]+"지역에"+weatherdata["특보데이터"]+"가 발생했어요");
-                    }
-    
-                    
-                    for(const local_data of Object.keys(weather_local_data)){
-                            switch (local_data){
-                                case "PTY":
-                                    console.log("강수유형");
-                                    break;
-                                case "RN1":
-                                    console.log("강수량:",weather_local_data[local_data]);
-                                    break;
-                                case "T1H":
-                                    console.log("현재기온:",weather_local_data[local_data]);
-                                    break;
-                                case "VEC":
-                                    console.log("풍속:",weather_local_data[local_data]);
-                            }
-                    }
-    
-    
-                    console.log("marker_Save_mape:",marker_save_map);
-                        
-                  
-    
-                    
-    
-          
-                    //place_data로부터 좌표를 불러와서 해당 좌표에 마커를 만드는과정.
-                    function displayMarker(place:any) {
-                        console.log("displaydata:",place);
-                        var marker = new window.kakao.maps.Marker({
-                            map: map,
-                            position: new window.kakao.maps.LatLng(place.y, place.x) 
-                        });
-      
-                        marker_save_map.set(place.place_name,[marker,place]);
-                        //marker_save_map에다가 장소명을 기준으로 마커,place_data를 저장한다.   
-    
-    
-                    }
-    
-    
-    
-                    //weatherdata로 놀공간.
-    
-                    console.log("geocoder end");
-
-                    //async2()
-                
-                }
 
 
 
@@ -1178,10 +1021,21 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
                   body: JSON.stringify({
                   data_around:[]})
                   }).json();*/
-    
+              datafromback=JSON.parse(localStorage.getItem("mart_around"));
+              console.log("datafromback:",datafromback);
+              
+              let mart_price_all_data=await fetch("http://localhost:3000/marts/selling",{
+                    method:'GET',
+                    headers:{
+                        Authorization:"Bearer "+localStorage.getItem("access_token")
+                    }
+                    })
+                    .then((res)=>{
+                        return res.json();
+                    })
               for(const position of datafromback){
-                  console.log("position:",position);
-                  var pos_data=marker_save_map.get(position);
+                  console.log("position:",position["martName"]);
+                  var pos_data=marker_save_map.get(position["martName"]);
                   console.log("pos_data:",pos_data);
       
                   try {
@@ -1234,7 +1088,13 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
       
                     console.log("pods_data:",pos_data);
                     console.log("linepath:",linepath);
-                      makemarker(pos_data,linepath)
+
+
+                    console.log("mart_price_all_data:",mart_price_all_data);
+                    mart_price_all_data=mart_price_all_data.data;
+                    console.log("mart_price_all_data:",mart_price_all_data);
+                    console.log("position:",position);
+                      makemarker(pos_data,linepath,position["martId"],mart_price_all_data)
       
                   } 
       
@@ -1248,7 +1108,7 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
             } 
       
       
-            function makemarker(pos_data:any,linepath:any){
+            async function makemarker(pos_data:any,linepath:any,martid:number,mart_price_all_data:any){
               var hexcolorcode="#"
               
               for(let i=0;i<1;i++){
@@ -1270,36 +1130,106 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
           
       
               console.log(polyline.getLength());//목적지에서 내위치까지의 거리를 알려줌.
-              var datas=[{name:"emart",itemlist:[{itemname:"사과",price:"1000"},{itemname:"배",price:"2000"}]}]
-              //오버레이에띄울 데이터들을 테스트용으로 넣은것. 추후에 백과 연결되면  바꿀것.
-      
-      
-              // var contents ;
-              // datas[0].itemlist.forEach(x=>{
-							// 		contents=`<div class="customoverlay">martname:${datas[0].name}itemname:${x.itemname}</br>price:${x.price}</br>length:${Math.round(polyline.getLength())}</br>
-							// 		time:${timechange(Math.round(polyline.getLength()/1.34))}</div>`
-              // })
-              contents+=`${pos_data[1].place_name}</br></div>`
-							var contents = `<div class="customoverlay bg-white shadow-lg rounded-lg p-4">`;
-								datas[0].itemlist.forEach(x => {
-											contents += `<div class="mb-4">
-											<ul class="list-none space-y-2">
-													<li class="font-bold text-lg">martname: ${datas[0].name}</li>
-													<li>itemname: ${x.itemname}</li>
-													<li>price: ${x.price}</li>
-											</ul>
-									</div>`;
-});
-contents += `<div class="pt-2">${pos_data[1].place_name}</div></div>`;
 
-					
-              //오버레이에 들어갈 내용들을 만드는 과정 참고로 string타입으로 들어간 각태그들의 id,class값들은 css파일의 영향을 받아서
-              //디자인이 가능하다.
-      
+              //디자인이 가능하ek
+              const over_lay_main=document.createElement("div");
+              const over_lay_serve=document.createElement("div");
+              const over_lay_star=document.createElement("div");
+              const over_lay_cart_list=document.createElement("div")
+              const over_lay_cart_list_btn=document.createElement("button");
+              over_lay_main.className="bg-green-100  rounded-lg w-[200px] h-[200px] relative"
+              over_lay_serve.className="bg-red-100 rounded-lg w-full h-[150px]"
+              over_lay_cart_list_btn.className="absolute bg-blue-100 w-[50px] h-[50px] right-0 bottom-0"
+              over_lay_cart_list.className="absolute bg-amber-400 w-[250px] h-[250px] bottom-[50px] left-[-20px]  z-30 overflow-scrol overflow-x-hidden"
+              over_lay_cart_list.style.display="none";
+              over_lay_star.className="flex justify-center items-center absolute bg-slate-500 w-[150px] h-[50px] bottom-0 left-0"  
+
+              over_lay_cart_list_btn.addEventListener("click",async ()=>{
+                if(over_lay_cart_list.style.display==="none"){
+                    over_lay_cart_list.style.display="block";
+
+                    if(over_lay_cart_list.children.length===0){
+                        console.log("line=0");
+
+                    const datas=await fetch("http://localhost:3000/marts",{
+                        method:'GET',
+                        headers:{
+                            Authorization:"Bearer "+localStorage.getItem("access_token")
+                        }
+                    })
+                    .then((res)=>{return res.json();})
+                    const datas2=await fetch("http://localhost:3000/marts/selling",{
+                        method:'GET',
+                        headers:{
+                            Authorization:"Bearer "+localStorage.getItem("access_token")
+                        }
+                    })
+                    .then((res)=>{
+                        return res.json();
+                    })
+
+                    console.log("datas:",datas);
+                    console.log("data2:",datas2);
+                    const data=await fetch("http://localhost:3000/marts/selling/5",{
+                        method:'GET',
+                        headers:{
+                            Authroization:"Bearer "+localStorage.getItem("access_token")
+                        }
+                    }) 
+                    .then((res)=>{
+                        return res.json();
+                    })
+                    console.log("cartdata:",data.data);
+                    for(const x of data.data){
+                        let lists=document.createElement("li");
+                        lists.textContent=x.productName+" "+x.finalPirce; 
+                        over_lay_cart_list.appendChild(lists);
+                    }}
+                    }
+                else{
+                    over_lay_cart_list.style.display="none";
+                    
+                }
+              })
+
+              function makestar(score:number){
+                const a=document.createElement("a");
+                score=Math.floor(score);
+                let star="";
+                for(let i=0;i<5;i++){
+                    score>i ? star+="★" :star+="☆"
+                }
+                a.textContent=star;
+                a.style.color="red";
+                a.target="_blank";
+                a.href="https://www.naver.com/";
+                over_lay_star.appendChild(a);
+              };
+              makestar(4.5);
+            
+              console.log("martId:",martid);
+              const mart_product_list=await fetch(`http://localhost:3000/marts/selling/${martid}`,{
+                method:"GET",
+                headers:{
+                    Authorization:"Bearer "+localStorage.getItem("access_token")
+                }
+              }).then((res)=>{return res.json();})
+              console.log("mart_product_list:",mart_product_list);
+              for(let x of mart_product_list.data){
+                let divs=document.createElement("div");
+                divs.textContent=x.productName+x.price;
+                over_lay_cart_list.appendChild(divs);
+              }
+              over_lay_serve.textContent+=(mart_price_all_data[martid]+"원");
+              over_lay_main.appendChild(over_lay_serve);
+              over_lay_main.appendChild(over_lay_star);
+              over_lay_main.appendChild(over_lay_cart_list_btn);
+              over_lay_main.appendChild(over_lay_cart_list);
+
               var customOverlay = new window.kakao.maps.CustomOverlay({
                       map: map,
                       clickable: true,
-                      content: contents,
+                      content: over_lay_main,
                       position: new window.kakao.maps.LatLng(pos_data[1].y,pos_data[1].x),
                       range: 500,
                       xAnchor: 1,
@@ -1307,7 +1237,7 @@ contents += `<div class="pt-2">${pos_data[1].place_name}</div></div>`;
                       zIndex: 3
       
               });  
-          
+              
       
       
               //애내둘은 아까 marker_Save_map에다가 저장해둔 마커객체,장소 데이터들을 의미한다.
@@ -1380,6 +1310,20 @@ contents += `<div class="pt-2">${pos_data[1].place_name}</div></div>`;
 
   return (
     <div className="relative w-full h-screen-50">
+        <div id="weather_bar" className=" flex justify-evenly w-full h-[50px] absolute top-0 bg-slate-100 z-40">
+            <div id="T1H">
+                <img src="/utils/temp.jpg" className="w-[50px] h-[50px] bg-white rounded-full inline "></img>
+            </div>
+            <div id="VEC">
+            <img src="/utils/wind.png" className="w-[50px] h-[50px] bg-white rounded-full inline"></img>
+            </div>
+            <div id="RN1">
+            <img src="/utils/rain.png" className="w-[50px] h-[50px] bg-white rounded-full inline"></img>
+            </div>
+
+           
+        </div>
+        <button id="closeopenbtn" className="w-[50px] h-[50px] bg-red-100 absolute top-[50px] right-0 z-50"onClick={()=>{closeandopen()}}>close</button>
       <div id="map" className="relative inset-0 w-full h-full"></div>
       <button
         onClick={panTo}
@@ -1393,6 +1337,7 @@ contents += `<div class="pt-2">${pos_data[1].place_name}</div></div>`;
       >
         표시하기
       </button>
+      <button id="map_zoom" className="flex justify-center absolute w-[60px] bottom-6 left-[150px] p-2 bg-white rounded-lg shadow-md z-10">줌 켜짐</button>
     </div>
   );
 };
