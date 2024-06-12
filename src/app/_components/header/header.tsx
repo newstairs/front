@@ -47,17 +47,6 @@ const Header: React.FC<HeaderProps> = ({ onLocationChange, onItemSelected }) => 
         <div className="flex items-center pl-6">
           <button className="">로그아웃</button>
         </div>
-        <div className="flex items-center">
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              value={query}
-              onChange={handleChange}
-              placeholder="현 위치를 입력하세요."
-            />
-            <button type="submit">Submit</button>
-          </form>
-        </div>
         <div>
           <ul className="flex space-x-4 p-4">
             {items.map((item, index) => (
