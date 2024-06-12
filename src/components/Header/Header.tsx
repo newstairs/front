@@ -4,10 +4,11 @@ import SearchModal from "./ToolTab/SearchDropdown";
 
 interface HeaderProps {
   onItemSelected: (index: number) => void;  // 콜백 함수 타입 정의
-  onSearch: (keyword: string) => void;
+  onSetCenter: (center: { lat: number, lng: number }) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onItemSelected }) => {
+const Header: React.FC<HeaderProps> = ({ onSetCenter, onItemSelected }) => {
+  const [center, setCenter] = useState({ lat: 37.566826, lng: 126.9786567 });
   const [activeIndex, setActiveIndex] = useState<number>(0); 
   const items: string[] = ["메인 품목 리스트", "마트 별 선택 항목", "장바구니"];
 
@@ -22,7 +23,7 @@ const Header: React.FC<HeaderProps> = ({ onItemSelected }) => {
       <div className="flex justify-between items-center">
 
         {/* 로그아웃 버튼 및 현 위치 설정 tooltab */}
-        <SearchModal />
+        <SearchModal onSetCenter={onSetCenter}/>
 
         <div>
           <ul className="flex space-x-4 p-4">

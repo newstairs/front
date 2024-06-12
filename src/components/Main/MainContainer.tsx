@@ -10,11 +10,7 @@ import { MapProvider } from "./Map/MapProvider";
 
 const MainContainer: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState<number>(0);
-  const [keyword, setKeyword] = useState<string>("");
-
-  const handleSearch = (newKeyword: string) => {
-    setKeyword(newKeyword);
-  };
+  const [center, setCenter] = useState({ lat: 37.566826, lng: 126.9786567 });
 
   // 품목 리스트 오버레이 랜더링 로직 
   const render = () =>{
@@ -33,12 +29,12 @@ const MainContainer: React.FC = () => {
   return (
     <div className="flex flex-col h-screen">
       <MapProvider>
-        <Header onItemSelected={setActiveIndex} onSearch={handleSearch}/>
+        <Header onItemSelected={setActiveIndex} onSetCenter={setCenter}/>
         <div className="flex mt-14 h-map-height">
-          <div className="flex w-[65%]">
-            <KakaoMap keyword={keyword}/>
+          <div className="flex w-full">
+            <KakaoMap center = {center}/>
           </div>
-          <div className="flex w-[35%]">
+          <div className="flex w-fit">
             {render()}
           </div>
         </div>
