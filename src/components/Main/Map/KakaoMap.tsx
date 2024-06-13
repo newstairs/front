@@ -47,16 +47,39 @@ interface GeolocationPosition {
   timestamp: number,
 }
 
+interface qa {
+  La:number,
+  Ma:number
+}
+
 const MapComponent = ({center}) => {
   const kakaoMap = useMap(); // MapProvider에서 제공하는 kakaoMap 객체를 가져옵니다.
 
   const [map, setMap] = useState(null); // map 상태를 초기화합니다.
+  const [zoom,setzoom]=useState(true);
+  const [geocoder, setGeocoder] = useState(null);
 
   var place_finded = new Map();//polyline 데이터 저장.
   var marker_save_map:Map<string,any> = new Map();//marker랑 place 데이터 저장
   var overlay_save_map:Map<string,any> = new Map();//오버레이 데이터 저장.
   var marker_tracker_map = new Map();//마커트래커 저장.
   var marker_function_save_map:Map<any,any> = new Map();//마커에 등록된 이벤트 지울떄 쓰는 함수.
+
+  const closeandopen=()=>{
+    const btn=document.getElementById("closeopenbtn");
+    const x=document.getElementById("weather_bar");
+    if(btn.textContent=="close"){
+      x.className="flex justify-evenly w-full h-[50px] absolute top-0 bg-slate-100 z-40 hidden";
+      btn.textContent="open";
+      btn.className="w-[50px] h-[50px] bg-red-100 absolute top-0 right-0 z-50"
+    }
+    else{
+      btn.textContent="close";
+      x.className="flex justify-evenly w-full h-[50px] absolute top-0 bg-slate-100 z-40"
+      btn.className="w-[50px] h-[50px] bg-red-100 absolute top-[50px] right-0 z-50"
+    }
+  }
+
   const area_mart_name=[];
 
 
@@ -258,7 +281,7 @@ const MapComponent = ({center}) => {
   let place_data: Place_Data;
   var origin_name:string//시작 지점 장소 기억.
 
-  async function convertCoordtToName(x:number, y:number) {
+  async function convertCoordToName(x:number, y:number) {
     let opt = {
       method:"GET",
       headers:{
@@ -298,8 +321,18 @@ const MapComponent = ({center}) => {
     return data;
   }
 
-
   // 기상청 api 관련 함수
+
+  var weather_area_code={
+    "109":"서울,인천,경기",
+    "159":"부산,울산,경남",
+    "143":"대구,경북",
+    "156":"광주,전남",
+    "146":"전북",
+    "133":"대전,세종,충남",
+    "131":"충북",
+    "105":"강원"
+  }
   // 기상청 api가 요구하는 좌표로 변환 함수
   function convertPosition(v1:string, v2:string):GridCoordinates {
     const RE = 6371.00877; // 지구 반경(km)
@@ -471,6 +504,7 @@ const MapComponent = ({center}) => {
 
 
   // 위치 정보 권한으로 사용자 현위치 불러오기
+  var origin_cord:string[];//사용자가 입력한 주소의 실제 위도 경도값을 말함
   // html5에서 위치 정보를 가져오는 함수
   function getLocation() {
     if (navigator.geolocation) {
@@ -512,8 +546,458 @@ const MapComponent = ({center}) => {
 
       marker_tracker_map.clear()
       
-      place_data = await getByCategory(Number(origin_cord[1]), Number(origin_cord[0])
+      place_data = await getByCategory(Number(origin_cord[1]), Number(origin_cord[0]));
+
+      const mart_data=place_data.documents[0];
+      console.log("mart_around:",mart_data);
+
+      let answer=await fetch("http://localhost:3000/marts",{
+        method:'POST',
+        headers:{
+          "Content-Type":"application/json",
+          Authorization:"Bearer "+localStorage.getItem("access_token")
+        },
+          body:JSON.stringify([{
+            martName:mart_data.place_name,
+            martAddress:mart_data.road_address_name
+          }]
+        )
+      })
+      .then((res)=>{return res.json()})
+      localStorage.setItem("mart_around",JSON.stringify(answer.data));
+      console.log("ans:",answer);
+      console.log("place_Data:",place_data);
+
+      let stnId: string = "";
+      var weatherdata={}
+      var weather_local_data={}
+
+      console.log("place_Data:",place_data);
+
+      let rs = convertPosition(origin_cord[0],origin_cord[1]);
+      let nx=rs.x;
+      let ny=rs.y;   
+
+      let url = `http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?serviceKey=${servicekey}&pageNo=1&numOfRows=10&base_date=${datearr[0]}&base_time=${datearr[1]}&dataType=JSON&nx=${nx}&ny=${ny}`; 
+
+      var option={
+        method:"GET"
+      }
+      data = await fetch(url,option)
+        .then((result)=>{
+        return result.json();
+      })
+
+      for(const x of data.response.body.items.item){
+        switch(x.category){
+          case "T1H":
+            weather_local_data["T1H"]=x.obsrValue ;
+            break;
+          case "PTY":
+            weather_local_data["PTY"]=x.obsrValue;
+            break;
+          case "RN1":
+            weather_local_data["RN1"]=x.obsrValue;
+            break;
+          case 'VEC':
+            weather_local_data["VEC"]=x.obsrValue;
+            break;
+          default :
+            break;
+        }
+      }
+
+      let fromTmFc=datearr[0];
+      let toTmFc=datearr[0];
+
+      let area_name=place_data["documents"][0]["address_name"].substring(0,2);
+
+      stnId = getstnid(area_name);
+
+      var data=await fetch(`http://apis.data.go.kr/1360000/WthrWrnInfoService/getWthrWrnList?serviceKey=${servicekey}&numOfRows=10&pageNo=1&dataType=JSON&fromTmFc=${fromTmFc}&toTmFc=${toTmFc}&stnId=${stnId}`,option)
+      .then((res)=>{
+        return res.json();
+      })
+      try{
+        var strs=data.response.body.items.item[0].title;
+        var arr=strs.split(" ");
+        weatherdata["특보데이터"]=""
+        for(const x of arr){
+          if(x.includes("주의보")){
+            weatherdata["특보데이터"]+=x;
+          }
+        }
+      }
+      catch(error){
+        weatherdata["특보데이터"]=null;
+        console.log("기상특보가 없음!");
+      }
+      finally{
+        for (var i=0; i<place_data["documents"].length; i++) {
+          displayMarker(place_data["documents"][i]);    
+        }      
+      }
+
+      if(weatherdata["특보데이터"]===null){
+        console.log("특보가 업성요")
+      }
+      else{
+        console.log(weatherdata["특보데이터"]);
+        console.log(weather_local_data);
+        console.log("현재"+weather_area_code[stnId]+"지역에"+weatherdata["특보데이터"]+"가 발생했어요");
+      }
+
+      for(const local_data of Object.keys(weather_local_data)){
+        switch (local_data){
+          case "PTY":
+            console.log("강수유형");
+            break;
+          case "RN1":
+            console.log("강수량:",weather_local_data[local_data]);
+            const doc1=document.getElementById(local_data)
+            let textNode = document.createElement("span");
+            textNode.textContent=(weather_local_data[local_data]+"mm");
+            textNode.className="inline";
+            doc1.appendChild(textNode);
+            break;
+          case "T1H":
+            console.log("현재기온:",weather_local_data[local_data]);
+            let textNode2 = document.createElement("span");
+            textNode2.textContent=(weather_local_data[local_data]+"°C");
+            textNode2.className="inline";
+            const doc2=document.getElementById(local_data)
+            doc2.appendChild(textNode2)
+            break;
+          case "VEC":
+            console.log("풍속:",weather_local_data[local_data]);
+            let textNode3= document.createElement("span");
+            textNode3.textContent=(weather_local_data[local_data]+"m/s");
+            textNode3.className="inline";
+            const doc3=document.getElementById(local_data)
+            doc3.appendChild(textNode3);
+            break;
+        }
+      }
+
+      //place_data로부터 좌표를 불러와서 해당 좌표에 마커를 만드는과정.
+      function displayMarker(place:any) {
+        console.log("displaydata:",place);
+        var marker = new window.kakao.maps.Marker({
+          map: map,
+          position: new window.kakao.maps.LatLng(place.y, place.x) 
+        });
+        marker_save_map.set(place.place_name,[marker,place]);
+        //marker_save_map에다가 장소명을 기준으로 마커,place_data를 저장한다.   
+      }
+
+      console.log("geocoder end");
     }
+    origin_name=await convertCoordToName(Number(origin_cord[1]),Number(origin_cord[0]));
+    getmarker(origin_name); 
+  }
+
+  async function async2() {
+    console.log("async2");
+    console.log("marker_Save_map:",marker_save_map);
+    console.log("over_lay_map:",overlay_save_map);
+    console.log("marker_funcion_save_map:",marker_function_save_map);
+    console.log("marker_trakcer_map",marker_tracker_map);
+
+    for(const key of overlay_save_map.keys()){
+      console.log("key test:",key);
+      place_finded.get(key).setMap(null);
+      overlay_save_map.get(key).setMap(null);
+    }
+
+    for(const key of marker_function_save_map.keys()){
+      window.kakao.maps.event.removeListener(key,'click',marker_function_save_map.get(key));
+    }
+
+    for(const x of marker_tracker_map.values()){
+      x.stop();//마커 트레이서기능을 종료시키는 과정.
+    }
+
+    marker_tracker_map.clear();
+    overlay_save_map.clear();
+    place_finded.clear();
+    marker_function_save_map.clear();
+    console.log("마커 함수 저장 제거후 :",marker_function_save_map.keys());
+    console.log("오버레이 키값 제거후:",overlay_save_map.keys());
+    //여기까지애들은 새로운 장바구니 조건에따라 길찾기 및 마트찾기를 생각해서 overlay과 marker_tracker를 카카오 맵에서 지우고
+    //초기화 하는 과정이다.
+
+    // 출발지(origin), 목적지(destination)의 좌표를 문자열로 변환합니다.
+    //맨위에서 사용자가 입력했던 자신의 위치를 말한다.
+    /*
+    카카오 map api에서 길찾기 에쓰던가 destination은 for문 안에 들어가먄됨.
+    const origin = `${origin_cord[1]},${origin_cord[0]}`; 
+
+    const destination=`${pos_data[1].x},${pos_data[1].y}`;
+    //위의 origin처럼 마트들의 경도,위도를 담는것.    
+
+    const headers = {
+      Authorization: `KakaoAK ${REST_API_KEY}`,
+      'Content-Type': 'application/json'
+    };
+    const queryParams = new URLSearchParams({
+      origin: origin,
+      destination: destination
+    });
+    const requestUrl = `${url}?${queryParams}`; // 파라미터까지 포함된 전체 URL*/
+
+    var datafromback=["KB국민은행 상계역지점","IBK기업은행365 중계주공3단지아파트","코리아세븐 세븐-중계2호 ATM"]// 오버레이 마커트레이서 polyline을 테스트하기위해서 넣은애.
+    // var datafromback=location["datas"]
+
+    datafromback=JSON.parse(localStorage.getItem("mart_around"));
+    console.log("datafromback:",datafromback);
+    let mart_price_all_data=await fetch("http://localhost:3000/marts/selling",{
+      method:'GET',
+      headers:{
+          Authorization:"Bearer "+localStorage.getItem("access_token")
+      }
+    })
+    .then((res)=>{
+      return res.json();
+    })
+    for(const position of datafromback){
+      console.log("position:",position["martName"]);
+      var pos_data=marker_save_map.get(position["martName"]);
+      console.log("pos_data:",pos_data);
+
+      try {
+        const options = {
+          method: 'POST',
+          headers: {
+            'accept': 'application/json',
+            'content-type': 'application/json',
+            'appKey': process.env.NEXT_PUBLIC_sk_api_key
+          },
+          body: JSON.stringify({
+            startX: origin_cord[1],
+            startY: origin_cord[0],
+            speed: 20,
+            endX: pos_data[1].x,
+            endY: pos_data[1].y,
+            startName: encodeURI(origin_name),
+            endName: encodeURI(position),
+            sort: 'index',
+            searchOption: "10"
+          })
+        };
+        var data=await fetch("https://apis.openapi.sk.com/tmap/routes/pedestrian?version=1&callback=function",options)
+          .then((result)=>{
+            return result.json();
+          }
+        )
+        var linepath:qa[]=[];
+        var testroute=data.features;
+        console.log("roudtedata:",testroute);
+        testroute.forEach((router:any,index:number)=>{
+          console.log(router,index);
+          if((router.geometry ?? {}).type==="LineString"){
+            router.geometry.coordinates.forEach((vertex:number[],idx:number)=>{
+              linepath.push(new window.kakao.maps.LatLng(vertex[1],vertex[0]))
+            })
+          }
+        });
+        //한 목적지에서 우리의 위치까지의 경로들을 linepath에다가 담는과정.
+      
+        console.log("pods_data:",pos_data);
+        console.log("linepath:",linepath);
+
+        console.log("mart_price_all_data:",mart_price_all_data);
+        mart_price_all_data=mart_price_all_data.data;
+        console.log("mart_price_all_data:",mart_price_all_data);
+        console.log("position:",position);
+        makemarker(pos_data,linepath,position["martId"],mart_price_all_data)
+      }
+      catch (error) {
+        console.error('Error:', error);
+      }
+    }
+  }
+
+  async function makemarker(pos_data:any, linepath:any,martid:number,mart_price_all_data:any) {
+    var hexcolorcode="#"
+              
+    for(let i=0;i<1;i++){
+    hexcolorcode+=Math.floor(Math.random() * (256 -1) +1).toString(16);
+    } 
+    hexcolorcode+="0000";
+    //같은 색이면 구분안되니까 polyline에들어갈 색들을 랜덤하게 만드는 과정.
+
+    var polyline = new window.kakao.maps.Polyline({
+      map: map,
+      path:linepath,
+      strokeWeight: 2,
+      strokeColor: hexcolorcode,
+      strokeOpacity: 1,
+      strokeStyle: 'line'
+    });//polyline즉 맵에 경로가 표시되는것들의 설정.
+
+    console.log(polyline.getLength());//목적지에서 내위치까지의 거리를 알려줌.
+
+    //디자인이 가능하다
+    const over_lay_main=document.createElement("div");
+    //const over_lay_serve=document.createElement("div");
+    const over_lay_star=document.createElement("div");
+    const over_lay_cart_list=document.createElement("div")
+    const over_lay_cart_list_btn=document.createElement("button");
+
+    over_lay_main.className = "bg-white rounded-lg shadow-lg p-4 w-[200px] h-[250px] relative";
+    //over_lay_serve.className = "bg-red-100 rounded-t-lg w-full h-[150px] mb-2";
+    over_lay_cart_list_btn.className = "bg-blue-500 text-white rounded-full w-[40px] h-[40px] absolute right-2 bottom-2";
+    over_lay_cart_list.className = "bg-amber-400 rounded-lg shadow-lg w-[250px] h-[250px] p-2 absolute bottom-[60px] left-[-20px] z-30 overflow-auto hidden";
+    over_lay_star.className = "flex justify-center items-center bg-slate-500 text-white rounded-b-lg w-full h-[40px] absolute bottom-0 left-0"; 
+    over_lay_cart_list_btn.innerText = "자세히";
+
+    over_lay_cart_list_btn.addEventListener("click", async () => {
+      if(over_lay_cart_list.style.display==="none") {
+        over_lay_cart_list.style.display="block";
+
+        if(over_lay_cart_list.children.length===0){
+          console.log("line=0");
+
+          const datas=await fetch("http://localhost:3000/marts",{
+            method:'GET',
+            headers:{
+              Authorization:"Bearer "+localStorage.getItem("access_token")
+            }
+          })
+          .then((res)=>{return res.json();})
+
+          const datas2=await fetch("http://localhost:3000/marts/selling",{
+            method:'GET',
+            headers:{
+              Authorization:"Bearer "+localStorage.getItem("access_token")
+            }
+          })
+          .then((res)=>{
+            return res.json();
+          })
+          console.log("datas:",datas);
+          console.log("data2:",datas2);
+
+          const data=await fetch("http://localhost:3000/marts/selling/5",{
+            method:'GET',
+            headers:{
+              Authroization:"Bearer "+localStorage.getItem("access_token")
+            }
+          }) 
+          .then((res)=>{
+            return res.json();
+          })
+          console.log("cartdata:",data.data);
+          for(const x of data.data){
+            let lists=document.createElement("li");
+            lists.textContent=x.productName+" "+x.finalPirce; 
+            over_lay_cart_list.appendChild(lists);
+          }
+        }
+      }
+      else{
+        over_lay_cart_list.style.display="none";
+      }
+    })
+    function makestar(score:number) {
+      const a = document.createElement("a");
+      score=Math.floor(score);
+      let star="";
+      for(let i=0;i<5;i++){
+        score>i ? star+="★" :star+="☆"
+      }
+      a.textContent=star;
+      a.style.color="red";
+      a.target="_blank";
+      a.href="https://www.naver.com/";
+      over_lay_star.appendChild(a);
+    }
+    makestar(4.5);
+
+    console.log("martId:",martid);
+    const mart_product_list=await fetch(`http://localhost:3000/marts/selling/${martid}`,{
+      method:"GET",
+      headers:{
+        Authorization:"Bearer "+localStorage.getItem("access_token")
+      }
+    })
+    .then((res)=>{return res.json();})
+    console.log("mart_product_list:",mart_product_list);
+    for(let x of mart_product_list.data){
+      let divs=document.createElement("div");
+      divs.textContent=x.productName+x.price;
+      over_lay_cart_list.appendChild(divs);
+    }
+
+    const ul = document.createElement("ul");
+    ul.className = "list-none p-0 m-0 space-y-2";
+    const li1 = document.createElement("li");
+    li1.className = "flex items-center";
+    li1.innerText = `마트명: ${pos_data[1].place_name}`
+    const li2 = document.createElement("li");
+    li2.className = "flex items-center";
+    li2.innerText = `총 가격: ${mart_price_all_data[martid]}원`
+    const li3 = document.createElement("li");
+    li3.className = "flex items-center";
+    li3.textContent = "거리: 1.2km";
+    const li4 = document.createElement("li");
+    li4.className = "flex items-center";
+    li4.textContent = "걸리는 시간: 15분";
+
+    ul.appendChild(li1);
+    ul.appendChild(li2);
+    ul.appendChild(li3);
+    ul.appendChild(li4);
+
+    over_lay_main.appendChild(ul);
+    over_lay_main.appendChild(over_lay_star);
+    over_lay_main.appendChild(over_lay_cart_list_btn);
+    over_lay_main.appendChild(over_lay_cart_list);
+
+    var customOverlay = new window.kakao.maps.CustomOverlay({
+      map: map,
+      clickable: true,
+      content: over_lay_main,
+      position: new window.kakao.maps.LatLng(pos_data[1].y,pos_data[1].x),
+      range: 500,
+      xAnchor: 1,
+      yAnchor: 1,
+      zIndex: 3
+    });
+
+    //애내둘은 아까 marker_Save_map에다가 저장해둔 마커객체,장소 데이터들을 의미한다.
+    var marker=pos_data[0];
+    var placename=pos_data[1].place_name;
+
+    console.log("placename check:",placename);
+              
+    overlay_save_map.set(placename,customOverlay);
+    place_finded.set(placename,polyline);
+    //오버레이,poyline들을 map에다가 장소명을 기준으로 저장.
+
+    console.log("placename out:",placename);
+    var markertracer=new MarkerTracker(map,marker);
+    marker_tracker_map.set(placename,markertracer);
+    markertracer.run();//마커트레이서 작동.
+
+    const func = (function(placename) {
+      return function() {
+        console.log("click!!!");
+        if (overlay_save_map.get(placename).getMap() === null) {
+          overlay_save_map.get(placename).setMap(map);
+          // place_finded.get(placename).setMap(map);
+          marker_tracker_map.get(placename).run();
+        } 
+        else {
+          overlay_save_map.get(placename).setMap(null);
+          //place_finded.get(placename).setMap(null);
+          marker_tracker_map.get(placename).stop();
+        }
+      };
+    })(placename);
+    // 클릭 이벤트 핸들러를 등록하고, 함수를 marker_function_save_map에 저장합니다.
+    window.kakao.maps.event.addListener(marker, 'click', func);
+    marker_function_save_map.set(marker, func);
   }
   
 
@@ -529,7 +1013,6 @@ const MapComponent = ({center}) => {
       const newMap = new kakaoMap.Map(container, options);
       setMap(newMap);
 
-      
       // 지도가 설정된 이후 컨트롤을 로딩하기
       if (newMap) {
         // 사용자 컨트롤
@@ -541,7 +1024,13 @@ const MapComponent = ({center}) => {
         const zoomControl = new kakaoMap.ZoomControl();
         newMap.addControl(zoomControl, kakaoMap.ControlPosition.LEFT);
       }
+
+      // 지오코더 초기화
+      const newGeocoder = new kakaoMap.services.Geocoder();
+      setGeocoder(newGeocoder);
+
       getLocation();
+
     }
   }, [kakaoMap, map])
 
@@ -553,11 +1042,81 @@ const MapComponent = ({center}) => {
     }
   }, [center, map]);
 
+  // 표시하기 버튼 이벤트 처리 로직 
+  useEffect(() => {
+    const btn = document.getElementById("showmarker");
+    if (btn) {
+      btn.addEventListener("click", async2);
+    }
+    return () => {
+      if (btn) {
+        btn.removeEventListener("click", async2);
+      }
+    };
+  })
+
+  // zoom 조절 버튼 로직
+  useEffect(() => {
+    const toggleZoom = () => {
+      const zoomBtn = document.getElementById("map_zoom");
+      if (map) {
+        const isZoomable = map.getZoomable();
+        map.setZoomable(!isZoomable);
+        if (zoomBtn) {
+          zoomBtn.innerText = isZoomable ? "줌 꺼짐" : "줌 켜짐";
+        }
+      }
+    };
+
+    const zoomBtn = document.getElementById("map_zoom");
+    if (zoomBtn && map) {
+      zoomBtn.addEventListener("click", toggleZoom);
+    }
+
+    return () => {
+      if (zoomBtn) {
+        zoomBtn.removeEventListener("click", toggleZoom);
+      }
+    };
+  }, [map]);
+
   return (
     <div className="relative w-full max-h-screen">
+      {/* 날씨 정보 */}
+      <div id="weather_bar" className=" flex justify-evenly w-full h-[50px] absolute top-0 bg-slate-100 z-40">
+        <div id="T1H" className='flex justify-center items-center'>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" className="w-12 h-12">
+            <path fill="#000000" d="M160 64c-26.5 0-48 21.5-48 48V276.5c0 17.3-7.1 31.9-15.3 42.5C86.2 332.6 80 349.5 80 368c0 44.2 35.8 80 80 80s80-35.8 80-80c0-18.5-6.2-35.4-16.7-48.9c-8.2-10.6-15.3-25.2-15.3-42.5V112c0-26.5-21.5-48-48-48zM48 112C48 50.2 98.1 0 160 0s112 50.1 112 112V276.5c0 .1 .1 .3 .2 .6c.2 .6 .8 1.6 1.7 2.8c18.9 24.4 30.1 55 30.1 88.1c0 79.5-64.5 144-144 144S16 447.5 16 368c0-33.2 11.2-63.8 30.1-88.1c.9-1.2 1.5-2.2 1.7-2.8c.1-.3 .2-.5 .2-.6V112zM208 368c0 26.5-21.5 48-48 48s-48-21.5-48-48c0-20.9 13.4-38.7 32-45.3V144c0-8.8 7.2-16 16-16s16 7.2 16 16V322.7c18.6 6.6 32 24.4 32 45.3z"/>
+          </svg>
+        </div>
+        <div id="VEC" className='flex justify-center items-center'>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="w-12 h-12">
+            <path fill="#74C0FC" d="M288 32c0 17.7 14.3 32 32 32h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32H352c53 0 96-43 96-96s-43-96-96-96H320c-17.7 0-32 14.3-32 32zm64 352c0 17.7 14.3 32 32 32h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H384c-17.7 0-32 14.3-32 32zM128 512h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32H160c17.7 0 32 14.3 32 32s-14.3 32-32 32H128c-17.7 0-32 14.3-32 32s14.3 32 32 32z"/>
+          </svg>
+        </div>
+        <div id="RN1" className='flex justify-center items-center'>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" className="w-12 h-12"><path fill="#74C0FC" d="M192 512C86 512 0 426 0 320C0 228.8 130.2 57.7 166.6 11.7C172.6 4.2 181.5 0 191.1 0h1.8c9.6 0 18.5 4.2 24.5 11.7C253.8 57.7 384 228.8 384 320c0 106-86 192-192 192zM96 336c0-8.8-7.2-16-16-16s-16 7.2-16 16c0 61.9 50.1 112 112 112c8.8 0 16-7.2 16-16s-7.2-16-16-16c-44.2 0-80-35.8-80-80z"/>
+          </svg>
+        </div>
+      </div>
+      <button id="closeopenbtn" className="w-[50px] h-[50px] bg-red-100 absolute top-[50px] right-0 z-50"onClick={()=>{closeandopen()}}>close</button>
+
+      {/* 지도 표시 */}
       <div id="map" className="relative inset-0 w-full h-full"></div>
+
+      {/* 기타 컨트롤 버튼 */}
       <button className="flex justify-center absolute w-[40px] bottom-6 left-4 p-2 bg-white rounded-lg shadow-md z-10" onClick={panTo}>
         <img src='./images/myLocation.png' alt='내 위치' />
+      </button>
+
+      <button
+        id="showmarker"
+        className="flex justify-center absolute w-[60px] bottom-6 left-20 p-2 bg-white rounded-lg shadow-md z-10"
+      >
+        표시하기
+      </button>
+      <button id="map_zoom" className="flex justify-center absolute w-[60px] bottom-6 left-[150px] p-2 bg-white rounded-lg shadow-md z-10">
+        줌 켜짐
       </button>
     </div>
   )
