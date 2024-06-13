@@ -9,6 +9,7 @@ interface selectItem {
 }
 
 const CheckList: React.FC = () => {
+  const [isListOpen, setIsListOpen] = useState(true); // 리스트 열림/닫힘 상태 관리
   const [selectItems, setSelectItems] = useState<selectItem[]>([
     { id: 2, image: '/path/to/image.jpg', name: '오렌지 주스'},
     { id: 5, image: '/path/to/image.jpg', name: '포도 주스'},
@@ -17,8 +18,12 @@ const CheckList: React.FC = () => {
 
   return (
     <div className="list-container bg-transparent">
-      <svg className="h-8 w-8 text-slate-500 toggle-icon"  width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" d="M0 0h24v24H0z"/>  <polyline points="7 7 12 12 7 17" />  <polyline points="13 7 18 12 13 17" /></svg>
-      <div className="overlay-container">
+      <div>
+        <button type="button" className='toggle-button' onClick={() => setIsListOpen(!isListOpen)}>
+          <svg className="h-8 w-8 text-slate-500 toggle-icon"  width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" d="M0 0h24v24H0z"/>  <polyline points="7 7 12 12 7 17" />  <polyline points="13 7 18 12 13 17" /></svg>
+        </button>
+      </div>
+      <div className={`overlay-container ${isListOpen ? 'overlay-container' : 'Close'}`}>
       {/* <form className="mx-auto mb-5">
         <div className="relative rounded-lg shadow-sm">
           <div className="absolute inset-y-0 start-0 flex items-center pl-3 pointer-events-none">

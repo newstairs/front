@@ -21,6 +21,7 @@ const MainList: React.FC = () => {
   const [allItems, setAllItems] = useState<allItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1); // 페이지 번호 상태 추가
   const [totalPages] = useState(9); // 총 페이지 수
+  const [isListOpen, setIsListOpen] = useState(true); // 리스트 열림/닫힘 상태 관리
 
   //로컬 스토리지에 사용자가 택한 아이템들을 추가하는 과정.
   /*const AddToLocalStorage=(itemid:number,itemimgurl:string,itemname:string)=>{
@@ -61,6 +62,7 @@ const MainList: React.FC = () => {
   }*/
 
 
+  
   //fetch문으로 가져와서 백엔드에다가 데이터를 넣는과정.
   const add_to_cartlist=async(itemid:number,itemimgurl:string,itemname:string)=>{
 
@@ -108,14 +110,13 @@ const MainList: React.FC = () => {
     setCurrentPage(page); // 페이지 변경 처리
   };
 return (
-  <div className="list-container bg-transparent">
+  <div className="list-container">
     <div>
-       <button type="button" className="toggle-button">
+      <button type="button" className="toggle-button" onClick={()=>setIsListOpen(!isListOpen)}>
       <svg className="h-8 w-8 text-slate-500 toggle-icon"  width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" d="M0 0h24v24H0z"/>  <polyline points="7 7 12 12 7 17" />  <polyline points="13 7 18 12 13 17" /></svg>
     </button>
     </div>
-   
-    <div className="overlay-container">
+    <div className={`overlay-container ${isListOpen ? 'overlay-container' : 'Close'}`}>
       {/* <form className="mx-auto mb-5">
         <div className="relative rounded-lg shadow-sm">
           <div className="absolute inset-y-0 start-0 flex items-center pl-3 pointer-events-none">

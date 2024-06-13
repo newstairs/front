@@ -1138,23 +1138,23 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
       
               console.log(polyline.getLength());//목적지에서 내위치까지의 거리를 알려줌.
 
-              //디자인이 가능하ek
+              //디자인이 가능하다
               const over_lay_main=document.createElement("div");
-              const over_lay_serve=document.createElement("div");
+              //const over_lay_serve=document.createElement("div");
               const over_lay_star=document.createElement("div");
               const over_lay_cart_list=document.createElement("div")
               const over_lay_cart_list_btn=document.createElement("button");
-              over_lay_main.className="bg-green-100  rounded-lg w-[200px] h-[200px] relative"
-              over_lay_serve.className="bg-red-100 rounded-lg w-full h-[150px]"
-              over_lay_cart_list_btn.className="absolute bg-blue-100 w-[50px] h-[50px] right-0 bottom-0"
-              over_lay_cart_list.className="absolute bg-amber-400 w-[250px] h-[250px] bottom-[50px] left-[-20px]  z-30 overflow-scrol overflow-x-hidden"
-              over_lay_cart_list.style.display="none";
-              over_lay_star.className="flex justify-center items-center absolute bg-slate-500 w-[150px] h-[50px] bottom-0 left-0"  
+
+							over_lay_main.className = "bg-white rounded-lg shadow-lg p-4 w-[200px] h-[250px] relative";
+							//over_lay_serve.className = "bg-red-100 rounded-t-lg w-full h-[150px] mb-2";
+							over_lay_cart_list_btn.className = "bg-blue-500 text-white rounded-full w-[40px] h-[40px] absolute right-2 bottom-2";
+							over_lay_cart_list.className = "bg-amber-400 rounded-lg shadow-lg w-[250px] h-[250px] p-2 absolute bottom-[60px] left-[-20px] z-30 overflow-auto hidden";
+							over_lay_star.className = "flex justify-center items-center bg-slate-500 text-white rounded-b-lg w-full h-[40px] absolute bottom-0 left-0"; 
+							over_lay_cart_list_btn.innerText = "자세히";
 
               over_lay_cart_list_btn.addEventListener("click",async ()=>{
                 if(over_lay_cart_list.style.display==="none"){
                     over_lay_cart_list.style.display="block";
-
                     if(over_lay_cart_list.children.length===0){
                         console.log("line=0");
                   
@@ -1176,12 +1176,16 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
                             }
                             over_lay_serve.textContent+=(mart_price_all_data[martid]+"원");
                         }
+
                         
                         else{
                             over_lay_serve.textContent="없음";      
+
                         }
                     }
                     else{
+
+
 
 
                     }
@@ -1201,7 +1205,7 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
               })
 
               function makestar(score:number){
-                const a=document.createElement("a");
+                const a = document.createElement("a");
                 score=Math.floor(score);
                 let star="";
                 for(let i=0;i<5;i++){
@@ -1229,9 +1233,11 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
                 let divs=document.createElement("div");
                 divs.textContent=x.productName+x.price;
                 over_lay_cart_list.appendChild(divs);
+
               }*/
               
               over_lay_main.appendChild(over_lay_serve);
+
               over_lay_main.appendChild(over_lay_star);
               over_lay_main.appendChild(over_lay_cart_list_btn);
               over_lay_main.appendChild(over_lay_cart_list);
@@ -1245,19 +1251,14 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
                       xAnchor: 1,
                       yAnchor: 1,
                       zIndex: 3
-      
               });  
               
-      
-      
               //애내둘은 아까 marker_Save_map에다가 저장해둔 마커객체,장소 데이터들을 의미한다.
               var marker=pos_data[0];
               var placename=pos_data[1].place_name;  
         
               console.log("placename check:",placename);
               
-      
-      
               overlay_save_map.set(placename,customOverlay);
               place_finded.set(placename,polyline);
               //오버레이,poyline들을 map에다가 장소명을 기준으로 저장.
@@ -1321,14 +1322,17 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
   return (
     <div className="relative w-full h-screen-50">
         <div id="weather_bar" className=" flex justify-evenly w-full h-[50px] absolute top-0 bg-slate-100 z-40">
-            <div id="T1H">
-                <img src="/utils/temp.jpg" className="w-[50px] h-[50px] bg-white rounded-full inline "></img>
+            <div id="T1H" className='flex justify-center items-center'>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" className="w-12 h-12">
+                <path fill="#000000" d="M160 64c-26.5 0-48 21.5-48 48V276.5c0 17.3-7.1 31.9-15.3 42.5C86.2 332.6 80 349.5 80 368c0 44.2 35.8 80 80 80s80-35.8 80-80c0-18.5-6.2-35.4-16.7-48.9c-8.2-10.6-15.3-25.2-15.3-42.5V112c0-26.5-21.5-48-48-48zM48 112C48 50.2 98.1 0 160 0s112 50.1 112 112V276.5c0 .1 .1 .3 .2 .6c.2 .6 .8 1.6 1.7 2.8c18.9 24.4 30.1 55 30.1 88.1c0 79.5-64.5 144-144 144S16 447.5 16 368c0-33.2 11.2-63.8 30.1-88.1c.9-1.2 1.5-2.2 1.7-2.8c.1-.3 .2-.5 .2-.6V112zM208 368c0 26.5-21.5 48-48 48s-48-21.5-48-48c0-20.9 13.4-38.7 32-45.3V144c0-8.8 7.2-16 16-16s16 7.2 16 16V322.7c18.6 6.6 32 24.4 32 45.3z"/></svg>
             </div>
-            <div id="VEC">
-            <img src="/utils/wind.png" className="w-[50px] h-[50px] bg-white rounded-full inline"></img>
+            <div id="VEC" className='flex justify-center items-center'>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="w-12 h-12">
+                <path fill="#74C0FC" d="M288 32c0 17.7 14.3 32 32 32h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32H352c53 0 96-43 96-96s-43-96-96-96H320c-17.7 0-32 14.3-32 32zm64 352c0 17.7 14.3 32 32 32h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H384c-17.7 0-32 14.3-32 32zM128 512h32c53 0 96-43 96-96s-43-96-96-96H32c-17.7 0-32 14.3-32 32s14.3 32 32 32H160c17.7 0 32 14.3 32 32s-14.3 32-32 32H128c-17.7 0-32 14.3-32 32s14.3 32 32 32z"/></svg>
             </div>
-            <div id="RN1">
-            <img src="/utils/rain.png" className="w-[50px] h-[50px] bg-white rounded-full inline"></img>
+            <div id="RN1" className='flex justify-center items-center'>
+            
+           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" className="w-12 h-12"><path fill="#74C0FC" d="M192 512C86 512 0 426 0 320C0 228.8 130.2 57.7 166.6 11.7C172.6 4.2 181.5 0 191.1 0h1.8c9.6 0 18.5 4.2 24.5 11.7C253.8 57.7 384 228.8 384 320c0 106-86 192-192 192zM96 336c0-8.8-7.2-16-16-16s-16 7.2-16 16c0 61.9 50.1 112 112 112c8.8 0 16-7.2 16-16s-7.2-16-16-16c-44.2 0-80-35.8-80-80z"/></svg>
             </div>
 
            
