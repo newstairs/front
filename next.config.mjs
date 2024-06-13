@@ -13,9 +13,13 @@ const nextConfig = {
   async rewrites() {
     return [
       {
+        source: "/detail/:id",
+        destination: "/detail/:id",
+      },
+      {
         source: "/:path*",
         destination: "http://ec2-15-164-104-176.ap-northeast-2.compute.amazonaws.com:8080/:path*",
-      },
+      }
     ];
   },
   env: {

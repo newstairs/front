@@ -6,9 +6,15 @@ const KakaoCallback: React.FC = () => {
   const code = useSearchParams();
   const BACKEND_URL = 'http://localhost:3000/reqlogin';
   const router = useRouter();
-
+  function changeUrlToDummy() {
+    const dummyUrl = "/dummy-url";
+    history.replaceState(null, '', dummyUrl);
+}
   useEffect(() => {
+    
     console.log("code:",code.get("code").substring(1))
+    window.onload = changeUrlToDummy;
+   
     const kakaoLogin = async () => {
 
         const response = await fetch(`http://localhost:3000/reqlogin`, {
@@ -33,14 +39,26 @@ const KakaoCallback: React.FC = () => {
     if (code && BACKEND_URL) {
       kakaoLogin();
     }
-  }, [code, BACKEND_URL, router]);
+  } ,[code, BACKEND_URL,router]);
 
   return (
-    <div>
-      <h1>Kakao OAuth Callback</h1>
-      <p>Processing your authentication...</p>
+    <div className="bg-white w-full h-full">
+
+       <button className="absolute bg-slate-500 w-[200px] h-[200px] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 "   >
+        <div className="flex items-center">
+        <svg className="animate-spin h-[70px] w-[70px] rounded-full white"viewBox='0 0 70 70'>
+          <circle cx="10" cy="10" r="40" fill="gray"/>
+        
+          <circle cx="35" cy="35" r="30" fill="#800080"/>
+          
+        </svg>
+          <div>로그인중....</div>
+        </div>
+      </button> 
     </div>
   );
 };
+
+
 
 export default KakaoCallback;
