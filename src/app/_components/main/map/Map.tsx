@@ -1174,12 +1174,12 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
                                 lists.textContent=x.productName+" "+x.finalPrice; 
                                 over_lay_cart_list.appendChild(lists);
                             }
-                            over_lay_serve.textContent+=(mart_price_all_data[martid]+"원");
+                           //over_lay_serve.textContent+=(mart_price_all_data[martid]+"원");
                         }
 
                         
                         else{
-                            over_lay_serve.textContent="없음";      
+                            //over_lay_serve.textContent="없음";      
 
                         }
                     }
@@ -1216,7 +1216,7 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
                 a.target="_blank";
                 let m="http://localhost:3000/reviews/deatil/35"
                 console.log("test:","http://localhost:3000/detail/35".substring(30,m.length))
-                a.href=`http://localhost:3000/detail/${martid}`;
+                a.href=`http://localhost:3000/reviews/detail/${martid}`;
                 over_lay_star.appendChild(a);
               };
               makestar(4.5);
@@ -1236,7 +1236,7 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
 
               }*/
               
-              over_lay_main.appendChild(over_lay_serve);
+              //over_lay_main.appendChild(over_lay_serve);
 
               over_lay_main.appendChild(over_lay_star);
               over_lay_main.appendChild(over_lay_cart_list_btn);
