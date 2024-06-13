@@ -1,63 +1,269 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../../../styles/overlayContainer.css';
+import Map from "../Map/KakaoMap";
+import FriendList from "./FriendList";
 
 interface CartItem {
-  id: number;
-  image: string; // 이미지 URL
-  name: string; // 상품명
-  mart: string; // 마트 이름
-  price: number; // 가격
+  productId: number;
+  productImgUrl: string; // 이미지 URL
+  productName: string; // 상품명
   quantity: number; // 초기 수량
+}
+interface friend_data{
+  uuid:string,
+  name:string
+}
+interface friend_data_list{
+  friend_datas:friend_data[]
 }
 
 const CartList: React.FC = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    { id: 1, image: '/path/to/image.jpg', name: '사과', mart: 'A마트', price: 4500, quantity: 1 },
-    { id: 2, image: '/path/to/image.jpg', name: '오렌지 주스', mart: 'B마트', price: 3500, quantity: 2 },
-    { id: 3, image: '/path/to/image.jpg', name: '통밀 빵', mart: 'C마트', price: 2500, quantity: 3 }
-  ]);
+
+  const [isopen,setisopen]= useState(()=>{});
+  const [hasitems,sethasitems]=useState(false);
+  const [friendlist,setfriendlist]=useState<friend_data_list>();
+  /* const [cartItems, setCartItems] = useState<CartItem[]>([
+    { productId: 1, productImgUrl: '/path/to/image.jpg', productName: '사과',  quantity: 1 },
+    { productId: 2, productImgUrl: '/path/to/image.jpg', productName: '오렌지 주스',  quantity: 2 },
+    { productId: 3, productImgUrl: '/path/to/image.jpg', productName: '통밀 빵',  quantity: 3 }
+  ]);*/
+
+
+  const cart_list=JSON.parse(localStorage.getItem("Item_Chosen")) || [];
+  const hasItems=cart_list.length>0;
 
   // 수량 조정 함수
-  const handleQuantityChange = (id: number, delta: number) => {
+  
+  /*const handleQuantityChange = (id: number, delta: number) => {
+    const cartItems=JSON.parse(localStorage.getItem("Item_Chosen"));
+    let update_list=cartItems.map(item=>{
+      
+      return item.productId === id ? { ...item, quantity: Math.max(0, item.quantity + delta) } : item
+    })
+    localStorage.setItem("Item_Chosen",JSON.stringify(update_list));
+    let spans=document.getElementById(`span_${id}`);
+    spans.textContent=(Number(spans.textContent)+delta >=0 ? Number(spans.textContent)+delta:0).toString();
+  };*/ 
+
+  const handleQuantityChange2=async (id:number,delta:number)=>{
+    const plus=`http://localhost:3000/cart/plus/${id}`;
+    const minus=`http://localhost:3000/cart/minus/${id}`;
+    if(delta>0){
+      calculation(plus,id,delta)
+
+    }
+    else{
+      calculation(minus,id,delta)
+    }
+
+
+  }
+  
+  const calculation= async function(calculation:string,id:number,delta:number){
+    console.log("calc:",calculation);
+    const data=await fetch(calculation,{
+      method:"PATCH",
+      headers:{
+        Authorization:"Bearer "+localStorage.getItem("access_token")
+      }
+    })
+    .then((res)=>{return res.json();})
+
+    if(data.success){
+    console.log("calcdata:",data.data);
+    let spans=document.getElementById(`span_${id}`);
+    console.log("x:",(Number(data.data.quantity)+delta));
+    const amount=(Number(data.data.quantity)) >=1 ? (Number(data.data.quantity)):1;
+    console.log("amount:",amount);
+    spans.textContent=amount.toString();}
+    else{
+      console.log("error:",data.message);
+    }
+
+  }
+  
+  
+  /*const handleQuantityChange = (id: number, delta: number) => {
     setCartItems(prevItems =>
       prevItems.map(item =>
-        item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
+        item.productId === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
       )
     );
-  };
+  };*/
+  const [location, setLocation] =useState<{ datas:string[] }>(null);
+  //useState<{ lat: number; lng: number}> ({lat: 33.450701, lng: 126.570667 });
+  const [friend_onoff,setfriend]=useState(false);
+  const clicketst=()=>{
+    //setLocation({lat,lng})
+    setLocation({datas:["KB국민은행 상계역지점","IBK기업은행365 중계주공3단지아파트"]})
+  console.log("click---test")
+  
+  }
+  const deleteitem=(itemid:number)=>{
+    const cartItems=JSON.parse(localStorage.getItem("Item_Chosen"));
+    const update_item=cartItems.filter(item=>{
+      if(item.productId===itemid){
+        return false;
+      }
+      return true;
+    })
+    console.log("update_item:",update_item);
+    localStorage.setItem("Item_Chosen",JSON.stringify(update_item));
+    let li=document.getElementById(`${itemid}`);
+    li.remove();
+
+  }
+
+  let friend_data;
+
+  const delete_item_by_one=async (itemid:number)=>{
+    const data=await fetch(`http://localhost:3000/cart/${itemid}`,{
+      method:"DELETE",
+      headers:{
+        Authorization:"Bearer "+localStorage.getItem("access_token")
+      }
+    })
+    .then((res)=>{return res.json();})
+
+    if(data.success){
+    let li=document.getElementById(`${itemid}`);
+    li.remove();}
+    else{
+      console.log("error:",data.message)
+    }
+  }
+
+  const delete_item_all=async()=>{
+    const data=await fetch("http://localhost:3000/cart",{
+      method:"DELETE",
+      headers:{
+        Authorization:"Bearer "+localStorage.getItem("access_token")
+      }
+    })
+    .then((res)=>{return res.json();})
+
+    if(data.success){
+      let doc_list=document.getElementsByClassName("item_list");
+      let lists=Array.from(doc_list);
+      for(const x of lists){
+        x.remove();
+      }
+    }
+    else{
+      console.log("error:",data.message);
+    }
+  }
+  const getfrienddata=async ()=>{
+    
+  if(friend_onoff===false){
+    
+
+    let datas= await fetch("http://localhost:3000/returnfriendlist",{
+      method:'GET',
+      headers:{
+        Authorization:"Bearer "+localStorage.getItem("access_token")
+      }
+    }).then((res)=>{return res.json();})
+    console.log(datas);
+    friend_data=datas.data.elements.map((x)=>{
+      return {
+        uuid:x.uuid,
+        name:x.profile_nickname
+      }
+    })
+    console.log(friend_data);
+    setfriendlist({friend_datas:friend_data})
+    setfriend(true)
+    const data=await fetch("http://localhost:3000/cart",{
+      method:"GET",
+      headers:{
+        Authorization:"Bearer "+localStorage.getItem("access_token")
+      }
+    }).then((res)=>{return res.json();})
+    console.log("useeffect:",data);
+    setItem(data.data);
+  
+  
+  }
+  else{
+    setfriend(false);
+  }
+
+
+  }
+  
+
+  //추후에 api에서 받아올떄를 가정한애
+  const [items,setItem]=useState()
+  useEffect(()=>{
+
+    const fetchdata=async()=>{
+      const data=await fetch("http://localhost:3000/cart",{
+        method:"GET",
+        headers:{
+          Authorization:"Bearer "+localStorage.getItem("access_token")
+        }
+      }).then((res)=>{return res.json();})
+      console.log("useeffect:",data);
+      setItem(data.data);
+
+      data.data.length>0 ? sethasitems(true):sethasitems(false)
+      console.log("items:",hasitems);
+
+    }
+
+
+    fetchdata()
+
+  },[])
+
+
+
 
   return (
+  <div className="list-container bg-transparent">
+      <svg className="h-8 w-8 text-slate-500 toggle-icon"  width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" d="M0 0h24v24H0z"/>  <polyline points="7 7 12 12 7 17" />  <polyline points="13 7 18 12 13 17" /></svg>
     <div className="overlay-container">
-      <form className="mx-auto mb-5">
-        <div className="relative rounded-lg shadow-sm">
-          <div className="absolute inset-y-0 start-0 flex items-center pl-3 pointer-events-none">
-            <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-              <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-            </svg>
-          </div>
-          <input type="search" id="default-search" className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="상품 검색" required />
-          <button type="submit" className="text-white absolute right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">검색</button>
-        </div>
-      </form>
-        <ul className="divide-y divide-gray-200">
-          {cartItems.map(item => (
-            <li key={item.id} className="flex items-center justify-between p-2">
-              <input type="checkbox"></input>
-              <img src={item.image} alt={item.name} className="h-10 w-10 object-cover" />
-              <span className="text-black">{item.name}</span>
-              <span className="text-black">{item.mart}</span>
-              <span className="text-black">{item.price.toLocaleString()}원</span>
-              <div className="flex items-center">
-                <button className="px-3 py-1 bg-red-300 rounded hover:bg-red-400"
-                  onClick={() => handleQuantityChange(item.id, -1)}>-</button>
-                <span className="mx-2 text-black">{item.quantity}</span>
-                <button className="px-3 py-1 bg-green-300 rounded hover:bg-green-400"
-                  onClick={() => handleQuantityChange(item.id, 1)}>+</button>
-              </div>
-            </li>
-          ))}
-        </ul>
+    
+    <button onClick={()=>{getfrienddata()}}>친구에게 보내기</button>
+    
+    { friend_onoff&&<FriendList frienddata={friendlist} item_list={items}/>
+      }
+    
+      { hasitems ?(
+                  <ul className="flex flex-col items-center divide-y divide-gray-200">
+
+                    {items.map(item => (
+                      <li  id={item.productId} key={item.productId} className="item_list w-full flex items-center p-2">
+                        <input type="checkbox"></input>
+                        <img src={item.productImgUrl} alt={item.productName} className="h-10 w-10 object-cover" />
+                        <span className="text-white">{item.productName}</span>
+                        <div className="flex items-center">
+                          <button className="px-3 py-1 bg-red-300 rounded hover:bg-red-400"
+                          onClick={() => handleQuantityChange2(item.productId, -1)}>-</button>
+                          <span id={`span_`+item.productId} className="mx-2 text-white">{item.quantity}</span>
+                          <button className="px-3 py-1 bg-green-300 rounded hover:bg-green-400"
+                          onClick={() => handleQuantityChange2(item.productId, 1)}>+</button>
+                        
+                        </div>
+                        <button onClick={()=>{delete_item_by_one(item.productId)}}className="mx-2 text-white">x</button>
+                      </li>
+                    ))}
+                    <button onClick={()=>{delete_item_all()}}>장바구니전체삭체</button>
+                  </ul>)
+                : (<p>아이템없음.</p>)
+        
+                    
+        }
+        
+        <button onClick={()=>clicketst()}>hello? {location!==null &&<Map location={location}/>}</button>
     </div>
+
+    
+
+    </div>
+
+
   );
 };
 

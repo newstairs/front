@@ -1,14 +1,27 @@
 .overlay-container {
-  position: fixed; /* 스크롤과 상관없이 고정됩니다 */
   top: 56px; /* '메인품목리스트' 헤더의 실제 위치에 따라 조정하세요 */
   right: 0;
-  width: 35%; /* 필요에 따라 너비 조정 */
-  height: calc(
-    100% - 56px
-  ); /* 헤더 아래로 전체 사용 가능 공간을 차지하도록 조정 */
-  background-color: rgba(255, 255, 255, 0.5); /* 반투명한 흰색 배경 */
+  width: fit-content;
+  min-width: 25%; /* 필요에 따라 너비 조정 */
   z-index: 1; /* 다른 요소 위에 나타나도록 높은 z-index */
   overflow-y: auto; /* 내용이 높이를 초과할 경우 스크롤 추가 */
-  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1); /* 시각적으로 더 잘 보이게 하기 위한 선택적 그림자 */
-  padding: 20px; /* 오버레이 내부의 패딩 */
+  padding: 10px; /* 오버레이 내부의 패딩 */
+}
+
+.toggle-icon {
+  top: 56px;
+  width: fit-content;
+  z-index: 1;
+}
+.list-container {
+  display: flex;
+}
+
+.toggle-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
