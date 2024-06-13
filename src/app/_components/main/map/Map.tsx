@@ -2,7 +2,6 @@
 import React, { useEffect, useRef ,useState} from 'react';
 import '../../../styles/mapmarker.css'
 import { text } from 'stream/consumers';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
 interface Location {
