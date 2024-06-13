@@ -688,10 +688,10 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
                 var longitude = position.coords.longitude;
               
       
-            options={
+                options={
                     center: new window.kakao.maps.LatLng(37.654733159968,127.07610170472),
                     level: 3
-            };
+                };
            
               map=new window.kakao.maps.Map(container, options);        
               //origin_cord=[latitude.toString(),longitude.toString()];
@@ -858,7 +858,8 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
                             case "RN1":
                                 console.log("강수량:",weather_local_data[local_data]);
                                 const doc1=document.getElementById(local_data)
-
+                        
+                                
                                 let textNode = document.createElement("span");
                                 textNode.textContent=(weather_local_data[local_data]+"mm");
                                 textNode.className="inline";
@@ -1109,8 +1110,14 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
       
       
             async function makemarker(pos_data:any,linepath:any,martid:number,mart_price_all_data:any){
+                //마트이름
+                pos_data[1].place_name
+
+
+
+
               var hexcolorcode="#"
-              
+              console.log("martid:",martid);
               for(let i=0;i<1;i++){
               hexcolorcode+=Math.floor(Math.random() * (256 -1) +1).toString(16);
               } 
@@ -1150,44 +1157,45 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
 
                     if(over_lay_cart_list.children.length===0){
                         console.log("line=0");
-
-                    const datas=await fetch("http://localhost:3000/marts",{
-                        method:'GET',
-                        headers:{
-                            Authorization:"Bearer "+localStorage.getItem("access_token")
+                  
+                        const data=await fetch(`http://localhost:3000/marts/selling/${martid}`,{
+                            method:'GET',
+                            headers:{
+                                Authorization:"Bearer "+localStorage.getItem("access_token")
+                            }
+                        }) 
+                        .then((res)=>{
+                            return res.json();
+                        })
+                        console.log("cartdata:",data.data);
+                        if(data.data.length!==0){
+                            for(const x of data.data){
+                                let lists=document.createElement("li");
+                                lists.textContent=x.productName+" "+x.finalPrice; 
+                                over_lay_cart_list.appendChild(lists);
+                            }
+                            over_lay_serve.textContent+=(mart_price_all_data[martid]+"원");
                         }
-                    })
-                    .then((res)=>{return res.json();})
-                    const datas2=await fetch("http://localhost:3000/marts/selling",{
-                        method:'GET',
-                        headers:{
-                            Authorization:"Bearer "+localStorage.getItem("access_token")
+                        
+                        else{
+                            over_lay_serve.textContent="없음";      
                         }
-                    })
-                    .then((res)=>{
-                        return res.json();
-                    })
-
-                    console.log("datas:",datas);
-                    console.log("data2:",datas2);
-                    const data=await fetch("http://localhost:3000/marts/selling/5",{
-                        method:'GET',
-                        headers:{
-                            Authroization:"Bearer "+localStorage.getItem("access_token")
-                        }
-                    }) 
-                    .then((res)=>{
-                        return res.json();
-                    })
-                    console.log("cartdata:",data.data);
-                    for(const x of data.data){
-                        let lists=document.createElement("li");
-                        lists.textContent=x.productName+" "+x.finalPirce; 
-                        over_lay_cart_list.appendChild(lists);
-                    }}
                     }
+                    else{
+
+
+                    }
+                }
                 else{
-                    over_lay_cart_list.style.display="none";
+                        over_lay_cart_list.style.display="none";
+                        
+                        if(over_lay_cart_list.children.length>0){
+                            let childs=over_lay_cart_list.children;
+    
+                            for(const x of childs){
+                                x.remove();
+                            }
+                        }
                     
                 }
               })
@@ -1202,13 +1210,15 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
                 a.textContent=star;
                 a.style.color="red";
                 a.target="_blank";
-                a.href="https://www.naver.com/";
+                let m="http://localhost:3000/reviews/deatil/35"
+                console.log("test:","http://localhost:3000/detail/35".substring(30,m.length))
+                a.href=`http://localhost:3000/detail/${martid}`;
                 over_lay_star.appendChild(a);
               };
               makestar(4.5);
             
               console.log("martId:",martid);
-              const mart_product_list=await fetch(`http://localhost:3000/marts/selling/${martid}`,{
+              /*const mart_product_list=await fetch(`http://localhost:3000/marts/selling/${martid}`,{
                 method:"GET",
                 headers:{
                     Authorization:"Bearer "+localStorage.getItem("access_token")
@@ -1219,8 +1229,8 @@ const KakaoMap: React.FC<MapProps> = ({ location }) => {
                 let divs=document.createElement("div");
                 divs.textContent=x.productName+x.price;
                 over_lay_cart_list.appendChild(divs);
-              }
-              over_lay_serve.textContent+=(mart_price_all_data[martid]+"원");
+              }*/
+              
               over_lay_main.appendChild(over_lay_serve);
               over_lay_main.appendChild(over_lay_star);
               over_lay_main.appendChild(over_lay_cart_list_btn);
