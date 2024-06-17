@@ -57,11 +57,13 @@ interface qa {
 const KakaoMapComponent = ({center}) => {
   // kakao map api script kakaoMap 객체 가져오기
   const kakaoMap = useMap();
-
+  const[zoom_func,set_zoom_func]=useState(null);
   // 상태 관리
   const [map, setMap] = useState(null); // map 상태를 초기화합니다.
+ 
   const [zoom,setzoom]=useState(true);
-
+ 
+  const [function_memmory,set_function_memmorty]=useState(null);
   // 마커 트래킹에 필요한 변수들
   var place_finded=new Map();//polyline 데이터 저장.
   var marker_save_map:Map<string,any>=new Map();//marker랑 place 데이터 저장
@@ -253,15 +255,21 @@ const KakaoMapComponent = ({center}) => {
       navigator.geolocation.getCurrentPosition(function showPosition(position:geolocationposition) {
         let latitude = position.coords.latitude;
         let longitude = position.coords.longitude;
+        origin_cord=[latitude.toString(),longitude.toString()]
         // let locPosition = new kakaoMap.LatLng(latitude, longitude);
-        let locPosition = new kakaoMap.LatLng(37.654733159968, 127.07610170472);
+        
+        if(center.lat!==null && center.lng!==null){
 
+            origin_cord[center.lat.toString(),center.lng.toString()]
+        }
         // 지도 중심을 사용자 위치로 이동시킵니다
+
+        let locPosition = new kakaoMap.LatLng(Number(origin_cord[0]), Number(origin_cord[1]));
         map.setCenter(locPosition);
         console.log("현 위치를 성공적으로 불러왔습니다!")
 
         // origin_cord = [latitude.toString(), longitude.toString()];
-        origin_cord=["37.654733159968","127.07610170472"]
+        //origin_cord=["37.654733159968","127.07610170472"]
         console.log("origin_cord: ", origin_cord);
 
         async1();
@@ -431,6 +439,64 @@ const KakaoMapComponent = ({center}) => {
             break;
         }
       }
+     
+      displayCenterMarker(center.lat,center.lng);
+      function zoomfunc(){
+        console.log("zoom")
+        setzoom(zoom=>{
+            const newzoom=!zoom;
+            map.setZoomable(newzoom);
+            if(newzoom!==true){
+                zoom_map.textContent="-";
+                
+                
+
+            }
+            else{
+                zoom_map.textContent="+"
+
+               
+
+            }
+
+            return newzoom;
+        })
+
+      }
+      let zoom_map=document.getElementById("map_zoom");
+      if(zoom_func===null){
+        console.log("event memeory")
+        set_zoom_func(()=>zoomfunc);
+        
+      }
+      else{
+      
+        
+        zoom_map.removeEventListener("click",zoom_func);
+        
+        set_zoom_func(()=>zoomfunc);
+      }
+      
+      zoom_map.addEventListener("click",zoom_func);
+
+      const btn = document.getElementById("showmarker");
+      function activeasync2(){
+        async2();
+        console.log("button")
+      }
+      if(function_memmory===null){
+        console.log("event memeory")
+        set_function_memmorty(()=>activeasync2);
+      }
+      else{
+          btn.removeEventListener("click",function_memmory);
+         set_function_memmorty(()=>activeasync2);
+      }
+
+      btn.addEventListener("click",activeasync2)
+
+
+
 
       // place_data로 좌표를 불러와 해당 좌표에 마커를 만드는 과정
       function displayMarker (place: any) {
@@ -442,6 +508,29 @@ const KakaoMapComponent = ({center}) => {
         marker_save_map.set(place.place_name, [marker,place])
       }
       console.log("geocoder End!");
+
+
+
+
+      function displayCenterMarker(lat:number,lng:number){
+
+        console.log("latlng:",lat,lng);
+        var imageSrc = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Me_bank_logo15.png/225px-Me_bank_logo15.png" // 마커이미지의 주소입니다    
+        let imageSize = new kakaoMap.Size(64, 69) // 마커이미지의 크기입니다
+        let imageOption = {offset: new kakaoMap.Point(27, 69)}; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다
+        
+        var markerImage = new kakaoMap.MarkerImage(imageSrc, imageSize, imageOption)
+        var marker = new kakaoMap.Marker({
+            map: map,
+            position: new kakaoMap.LatLng(lat,lng), 
+            image:markerImage
+
+        });
+        console.log("markercenter");
+        //center_marker_save_map.set("center",marker);
+      }
+    
+
     }
     origin_name = await convertcoordtoname(Number(origin_cord[1]),Number(origin_cord[0]));
     getmarker(origin_name);
@@ -589,10 +678,11 @@ const KakaoMapComponent = ({center}) => {
     }
     var data=await fetch(`https://dapi.kakao.com/v2/local/geo/coord2address.json?x=${x}&y=${y}`,opt)
     .then((res)=>{return res.json()})
-
+    try{
     return (
       data["documents"][0]["road_address"]["address_name"]
-    );
+    );}
+    catch(error){console.log("도로명주소가없어요");}
   }
 
   // async2
@@ -790,7 +880,7 @@ const KakaoMapComponent = ({center}) => {
             return res.json();
           })
           console.log("cartdata:",data.data);
-          if(data.data.length!==0){
+          if(data.success){
             for(const x of data.data){
                 let lists=document.createElement("li");
                 lists.textContent=x.productName+" "+x.finalPrice; 
@@ -800,20 +890,26 @@ const KakaoMapComponent = ({center}) => {
           }
           else{
             //over_lay_serve.textContent="없음";
+            let lists=document.createElement("li");
+            lists.textContent="오류가 발생했습니다. 다시시도해주세요"
+            over_lay_cart_list.appendChild(lists);
           }
         }
         else {
         }
+        over_lay_cart_list_btn.innerText="닫기";
       }
       else{
         over_lay_cart_list.style.display="none";
-        
+                        
         if(over_lay_cart_list.children.length>0){
-          let childs=over_lay_cart_list.children;
-          for(const x of childs){
-            x.remove();
-          }
+            let childs=Array.from(over_lay_cart_list.children);
+
+            for(const x of childs){
+                x.remove();
+            }
         }
+        over_lay_cart_list_btn.innerText="자세히";
       }
     })
 
@@ -870,6 +966,32 @@ const KakaoMapComponent = ({center}) => {
     var placename=pos_data[1].place_name;  
 
     console.log("placename check:",placename);
+
+    let walk_length=document.createElement("li");
+    walk_length.textContent="거리:"+Math.round(polyline.getLength()).toString()+"m";
+
+    let place_name_li=document.createElement("li");
+    place_name_li.textContent=placename;
+
+    let time=document.createElement("li");
+
+
+    let consume_time=Math.round(polyline.getLength()/1.3);
+    
+    time.textContent="소요 시간:"+timechange(consume_time);
+
+    let total_price=document.createElement("li");
+    console.log("check value:",mart_price_all_data.data[martid],martid)
+    let p=mart_price_all_data.data[martid]!==undefined ? mart_price_all_data.data[martid].toString()+"원":"0원";
+    total_price.textContent="합계:"+p
+
+
+    over_lay_main.appendChild(place_name_li);
+    over_lay_main.appendChild(total_price);
+    over_lay_main.appendChild(walk_length);
+    over_lay_main.appendChild(time);
+
+
     
     overlay_save_map.set(placename,customOverlay);
     place_finded.set(placename,polyline);
@@ -909,10 +1031,9 @@ const KakaoMapComponent = ({center}) => {
     map.panTo(moveLatLon); 
   }
 
-  const area_mart_name = [];
-
   // 카카오맵 load hook
   useEffect(()=>{
+    console.log("useeffect");
     if (kakaoMap && !map) {
       // 지도 설정 및 표시할 div 설정
       const container = document.getElementById('map'); 
@@ -929,19 +1050,37 @@ const KakaoMapComponent = ({center}) => {
     if(kakaoMap && map) {
       getLocation();
     }
-  }, [kakaoMap, map]);
+  }, [kakaoMap,map,center]);
 
   // 현 위치가 변경된 경우 중심좌표를 변경한 장소로 변경하는 로직 
-  useEffect(() => {
+  /*useEffect(() => {
     if (map && center) {
       const moveLatLon = new kakaoMap.LatLng(center.lat, center.lng);
       map.setCenter(moveLatLon);
     }
-  }, [center, map]);
+  }, [center, map]);*/
 
   // 표시하기 버튼 클릭시 async2 함수 실행(마커 오버레이 보여주기)
-  useEffect(() => {
+  /*useEffect(() => {
     const btn = document.getElementById("showmarker");
+      function activeasync2(){
+        async2();
+        console.log("button")
+      }
+    if(function_memmory===null){
+        console.log("event memeory")
+        set_function_memmorty(()=>activeasync2);
+           
+    }
+    else{
+            
+      btn.removeEventListener("click",function_memmory);
+      set_function_memmorty(()=>activeasync2);
+    }
+
+    btn.addEventListener("click",activeasync2)
+    const area_mart_name = [];
+
     if (btn) {
       btn.addEventListener("click", async2);
     }
@@ -950,7 +1089,7 @@ const KakaoMapComponent = ({center}) => {
         btn.removeEventListener("click", async2);
       }
     };
-  }, []);
+  }, []);*/
 
   // html
   return (
@@ -996,7 +1135,7 @@ const KakaoMapComponent = ({center}) => {
         id="map_zoom" 
         className="flex justify-center absolute w-[60px] bottom-6 left-[150px] p-2 bg-white rounded-lg shadow-md z-10"
       >
-        줌 켜짐
+        +
       </button>
     </div>
   )
