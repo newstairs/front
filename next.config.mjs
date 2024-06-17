@@ -12,8 +12,8 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: "/reviews/:id",
-        destination: "/reviews/:id",
+        source: "/reviews/detail/:id",
+        destination: "/reviews/detail/:id",
       },
       {
         source: "/:path*",

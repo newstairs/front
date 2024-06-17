@@ -56,8 +56,6 @@ const MainList: React.FC = () => {
           localStorage.setItem("Item_Chosen",JSON.stringify(product_list));
         }
 
-
-      
       }    
   }*/
 
