@@ -11,10 +11,10 @@ const config: Config = {
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
       height: {
-        'screen-50': 'calc(100vh - 50px)',
+        "h-screen-50": "calc(100% - 56px)",
       }
     },
   },

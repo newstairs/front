@@ -1,14 +1,14 @@
 'use client';
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState } from "react";
+import SearchModal from "./ToolTab/SearchDropdown";
 
 interface HeaderProps {
-  onLocationChange: (lat: number, lng: number) => void;
   onItemSelected: (index: number) => void;  // 콜백 함수 타입 정의
+  onSetCenter: (center: { lat: number, lng: number }) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onLocationChange, onItemSelected }) => {
-  const [location, setLocation] = useState<string>('');
-  const [query, setQuery] = useState<string>('');
+const Header: React.FC<HeaderProps> = ({ onSetCenter, onItemSelected }) => {
+  const [center, setCenter] = useState({ lat: 37.566826, lng: 126.9786567 });
   const [activeIndex, setActiveIndex] = useState<number>(0); 
   const items: string[] = ["메인 품목 리스트", "마트 별 선택 항목", "장바구니"];
 
@@ -18,35 +18,13 @@ const Header: React.FC<HeaderProps> = ({ onLocationChange, onItemSelected }) => 
     setActiveIndex(index);  
   }
 
-  // 현 위치 입력 관련 이벤트
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value);
-  };
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    // 주소 검색 API 호출
-    if (typeof window !== 'undefined' && window.kakao && window.kakao.maps && window.kakao.maps.services) {
-      const geocoder = new window.kakao.maps.services.Geocoder();
-      geocoder.addressSearch(query, (result: any, status: any) => {
-        if (status === window.kakao.maps.services.Status.OK) {
-          const { y: lat, x: lng } = result[0];
-          onLocationChange(lat, lng);
-        } else {
-          alert('검색 결과가 없습니다.');
-        }
-      });
-    } else {
-      alert('Kakao Maps API를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
-    }
-  };
-
   return (
-    <header className="fixed top-0 w-full shadow-md">
-      <div className="flex justify-between">
-        <div className="flex items-center pl-6">
-          <button className="">로그아웃</button>
-        </div>
+    <header className="fixed top-0 h-14 w-full shadow-md z-50">
+      <div className="flex justify-between items-center">
+
+        {/* 로그아웃 버튼 및 현 위치 설정 tooltab */}
+        <SearchModal onSetCenter={onSetCenter}/>
+
         <div>
           <ul className="flex space-x-4 p-4">
             {items.map((item, index) => (

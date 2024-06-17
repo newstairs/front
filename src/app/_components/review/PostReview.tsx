@@ -6,31 +6,40 @@ const PostReview = () => {
   const [starRating, setStarRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
   const [image, setImage] = useState(null);
+  
+  const martId = 1 // 임의의 마트 id이다.
 
-  const Link = '/main'
+  const Link = `/reviews/detail/${martId}`
 
   // api 통신 로직은 수정예정이다.(마트 이름과 마트 정보를 가져와야하는 추가 보수 사항이 존재)
   const handleReviewSubmit = async () => {
     const formData = new FormData();
     formData.append('reviewContent', reviewText);
     formData.append('score', starRating.toString());
-    if (image) {
-      formData.append('image', image);
+    formData.append('martId', martId.toString());
+    // if (image) {
+    //   formData.append('image', image);
+    // }
+    if(starRating === 0) {
+      alert('별점을 선택해주세요');
+      return;
     }
-    try {
-      const response = await fetch('/reviews', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (response.ok) {
-        window.location.href = Link;
-        console.log('리뷰 작성 완료');
-      } else {
-        console.error('리뷰 작성 실패');
+    else {
+      try {
+        const response = await fetch('/reviews/:id', {
+          method: 'POST',
+          body: formData
+        });
+  
+        if (response.ok) {
+          window.location.href = Link;
+          console.log('리뷰 작성 완료');
+        } else {
+          console.error('리뷰 작성 실패');
+        }
+      } catch (error) {
+        console.error('오류 발생:', error);
       }
-    } catch (error) {
-      console.error('오류 발생:', error);
     }
   }
 
@@ -44,8 +53,7 @@ const PostReview = () => {
   return (
     <div className='flex-col justify-center items-center'>
       <div className='ml-[25%] w-[50%] h-screen'>
-        <p className='pt-10'>이마트 임의의 지점</p>
-        <p>마트 사진이 들어올 예정</p>
+        <p className='pt-10'>리뷰 할 마트명</p>
         {/* 별점 입력 기능 */}
         <MakeStar setStarRating={setStarRating}/>
 
@@ -63,7 +71,7 @@ const PostReview = () => {
         </textarea>
 
         {/* 필요시 사진 추가 */}
-        <div className='mt-5'>
+        {/* <div className='mt-5'>
           <p className="block mb-2 font-medium text-gray-900">사진을 등록해주세요</p>
           <div className="rounded-md border  bg-gray-50 p-4 shadow-md w-24 h-24 mt-2">
             <label htmlFor="upload" className="justify-center h-full flex flex-col items-center gap-2 cursor-pointer">
@@ -80,7 +88,8 @@ const PostReview = () => {
             </label>
             <input id="upload" type="file" className="hidden" onChange={handleImageChange}/>
           </div>
-        </div>
+        </div> */}
+
 
         {/* 작성 완료 버튼 */}
         <div className='flex justify-center'>

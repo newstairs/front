@@ -1,4 +1,4 @@
-import LoginHandler from '@/app/_components/loginHandler'
+import LoginHandler from '../../../_components/Login/loginHandler'
 import React from 'react'
 
 const Page: React.FC = () => {
