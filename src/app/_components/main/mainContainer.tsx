@@ -50,10 +50,10 @@ const MainContainer: React.FC = () => {
   }
 
   return (
-    <div className="fixed w-full h-screen-50">
+    <div className="fixed w-full h-h-screen-50">
       <MapProvider>
         <Header onItemSelected={setActiveIndex} onSetCenter={setCenter}/>
-        <div className="flex mt-14 h-screen-50">
+        <div className="flex mt-14 h-full">
           <div className="flex w-full">
             <KakaoMap center = {center}/>
           </div>

@@ -1,4 +1,7 @@
+
 import React,{useState, useEffect} from "react";
+
+
 
 interface MapProps{
     cartlist:CartItem[],
@@ -53,14 +56,14 @@ const SendCartlist: React.FC<MapProps>=({cartlist,carttruth})=>{
                 {testlist.map((item,idx)=>(
                     <li key={idx} className="li flex grow  p-2 bg-white rounded-lg my-5 mx-auto w-4/5 ">
                                       <input className="member_check" type="checkbox"></input>
-            
+             
               <span className="text-black">{item.name}</span>
                 </li>
                 ))}
 
             </ul>
             
-        
+         
         </div>
 
     </div>

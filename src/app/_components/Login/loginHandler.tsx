@@ -2,12 +2,21 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
-const LoginHandler: React.FC = () => {
+interface loginprops{
+  code:string
+}
+
+const LoginHandler: React.FC<loginprops> = ({code}) => {
+
+  const kakao_code=code;
+
   const router = useRouter();
-  const code = typeof window !== 'undefined' ? new URL(window.location.href).searchParams.get("code") : null;
+
+  //const code = typeof window !== 'undefined' ? new URL(window.location.href).searchParams.get("code") : null;
   const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   useEffect(() => {
+    console.log("code:",code)
     const kakaoLogin = async () => {
       if (!code) {
         console.error("코드가 URL에 존재하지 않습니다.");
@@ -29,7 +38,7 @@ const LoginHandler: React.FC = () => {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ access_code: code })
+          body: JSON.stringify({ access_code: kakao_code })
         });
 
         if (!response.ok) {
@@ -68,3 +77,4 @@ const LoginHandler: React.FC = () => {
 };
 
 export default LoginHandler;
+

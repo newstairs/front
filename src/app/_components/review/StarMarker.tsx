@@ -1,7 +1,7 @@
 'use client'
 import { useState } from "react";
 
-const MakeStar = () => {
+const MakeStar = ({ setStarRating }) => {
   const [selectedRating, setSelectedRating] = useState(null);
   const [hoveredRating, setHoveredRating] = useState(null);
 
@@ -15,6 +15,9 @@ const MakeStar = () => {
 
   const handleStarClick = (rating) => {
     setSelectedRating(rating);
+    if ( setStarRating ) {
+      setStarRating(rating); // 부모 컴포넌트로 별점 값 전달
+    }
     console.log('Selected Rating:', rating);
   };
 
@@ -52,9 +55,3 @@ const MakeStar = () => {
 }
 
 export default MakeStar;
-
-
-
-
-
-
