@@ -14,7 +14,11 @@ const config: Config = {
         "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
       height: {
+<<<<<<< Updated upstream
         "map-height": "calc(100% - 56px)",
+=======
+        'screen-50': 'calc(100vh - 56px)',
+>>>>>>> Stashed changes
       }
     },
   },
