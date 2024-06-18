@@ -134,20 +134,41 @@ const CartList: React.FC = () => {
     }
   }
 
-  const [items, setItem] = useState()
-  useEffect(() => {
-    const fetchdata = async () => {
-      const data = await fetch("http://localhost:3000/cart", {
-        method: "GET",
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("access_token")
-        }
-      }).then((res) => { return res.json(); })
-      setItem(data.data);
-      data.data.length > 0 ? sethasitems(true) : sethasitems(false)
+ const [items, setItem] = useState<CartItem[]>([]);
+
+  // useEffect(() => {
+  //   const fetchdata = async () => {
+  //     const data = await fetch("http://localhost:3000/cart", {
+  //       method: "GET",
+  //       headers: {
+  //         Authorization: "Bearer " + localStorage.getItem("access_token")
+  //       }
+  //     }).then((res) => { return res.json(); })
+  //     setItem(data.data);
+  //     data.data.length > 0 ? sethasitems(true) : sethasitems(false)
+  //   }
+  //   fetchdata()
+  // }, [])
+   useEffect(() => {
+  const fetchdata = async () => {
+  const response = await fetch("http://localhost:3000/cart", {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("access_token")
     }
-    fetchdata()
-  }, [])
+  });
+
+  const data = await response.json();
+  if (data && data.data && Array.isArray(data.data)) {
+    setItem(data.data);
+    sethasitems(data.data.length > 0);
+  } else {
+    setItem([]);
+    sethasitems(false);
+  }
+}
+fetchdata()
+},[]);
 
   return (
     <div className="list-container">
@@ -168,7 +189,7 @@ const CartList: React.FC = () => {
 
         {hasitems ? (
           <ul className="flex flex-col items-center divide-y divide-gray-200 space-y-4">
-            {items.map(item => (
+            {(items || []).map(item => (
               <li id={item.productId} key={item.productId} className="item_list w-full flex items-center p-2 bg-white rounded-lg shadow-md">
                 <input type="checkbox" className="mr-2" />
                 <img src={item.productImgUrl} alt={item.productName} className="h-10 w-10 object-cover mr-2" />
@@ -204,16 +225,9 @@ const CartList: React.FC = () => {
             </button>
           </ul>
         ) : (
-          <p className="text-gray-500">아이템 없음.</p>
+          <p className="text-gray-500">장바구니에 품목을 담아주세요</p>
         )}
 
-        <button
-          onClick={() => clicketst()}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg mt-4"
-        >
-          {location !== null ? "지도 보기" : "hello?"}
-        </button>
-        {location !== null && <Map location={location} />}
       </div>
     </div>
   );
