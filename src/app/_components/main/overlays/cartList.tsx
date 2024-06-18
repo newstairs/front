@@ -15,14 +15,16 @@ interface friend_data {
   name: string
 }
 
-interface friend_data_list {
-  friend_datas: friend_data[]
+interface Props {
+  frienddata: friend_data[],
+  item_list: CartItem[]
 }
+
 
 const CartList: React.FC = () => {
   const [isListOpen, setIsListOpen] = useState(true); // 리스트 열림/닫힘 상태 관리
   const [hasitems, sethasitems] = useState(false);
-  const [friendlist, setfriendlist] = useState<friend_data_list>();
+  const [friendlist, setfriendlist] = useState<friend_data[]>();
   const cart_list = JSON.parse(localStorage.getItem("Item_Chosen")) || [];
   const hasItems = cart_list.length > 0;
   const [location, setLocation] = useState<{ datas: string[] }>(null);
@@ -107,7 +109,7 @@ const CartList: React.FC = () => {
   }
 
   const getfrienddata = async () => {
-    if (friend_onoff === false) {
+    if (!friend_onoff) {
       let datas = await fetch("http://localhost:3000/returnfriendlist", {
         method: 'GET',
         headers: {
@@ -120,7 +122,7 @@ const CartList: React.FC = () => {
           name: x.profile_nickname
         }
       })
-      setfriendlist({ friend_datas: friend_data })
+      setfriendlist( friend_data )
       setfriend(true)
       const data = await fetch("http://localhost:3000/cart", {
         method: "GET",
@@ -135,25 +137,34 @@ const CartList: React.FC = () => {
   }
 
 
+
   function handlefriendset(){
     setfriend(false)
     console.log("setfriend");
   }
 
   const [items, setItem] = useState()
+
   useEffect(() => {
-    const fetchdata = async () => {
-      const data = await fetch("http://localhost:3000/cart", {
-        method: "GET",
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("access_token")
-        }
-      }).then((res) => { return res.json(); })
-      setItem(data.data);
-      data.data.length > 0 ? sethasitems(true) : sethasitems(false)
+  const fetchdata = async () => {
+  const response = await fetch("http://localhost:3000/cart", {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("access_token")
     }
-    fetchdata()
-  }, [])
+  });
+
+  const data = await response.json();
+  if (data && data.data && Array.isArray(data.data)) {
+    setItem(data.data);
+    sethasitems(data.data.length > 0);
+  } else {
+    setItem([]);
+    sethasitems(false);
+  }
+}
+fetchdata()
+},[]);
 
   return (
     <div className="list-container">
@@ -177,8 +188,8 @@ const CartList: React.FC = () => {
 
         {hasitems ? (
           <ul className="flex flex-col items-center divide-y divide-gray-200 space-y-4">
-            {items.map(item => (
-              <li id={item.productId} key={item.productId} className="item_list w-full flex items-center p-2 bg-white rounded-lg shadow-md">
+            {(items || []).map(item => (
+              <li id={item.productId.toString()} key={item.productId} className="item_list w-full flex items-center p-2 bg-white rounded-lg shadow-md">
                 <input type="checkbox" className="mr-2" />
                 <img src={item.productImgUrl} alt={item.productName} className="h-10 w-10 object-cover mr-2" />
                 <span className="flex-grow">{item.productName}</span>
@@ -213,7 +224,7 @@ const CartList: React.FC = () => {
             </button>
           </ul>
         ) : (
-          <p className="text-gray-500">아이템 없음.</p>
+          <p className="text-gray-500">장바구니에 품목을 담아주세요</p>
         )}
 
 
@@ -222,12 +233,6 @@ const CartList: React.FC = () => {
   );
 };
 
+
 export default CartList;
-/*
-<button
-          onClick={() => clicketst()}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg mt-4"
-        >
-          {location !== null ? "지도 보기" : "hello?"}
-        </button>
-        {location !== null && <Map location={location} />}*/ 
+

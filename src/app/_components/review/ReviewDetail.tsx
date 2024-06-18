@@ -3,6 +3,7 @@ import React ,{ useEffect,useState } from 'react';
 import { useSearchParams,useRouter } from 'next/navigation'
 import ReviewPagnation from "../../_components/review/ReviewPagnation";
 import ShowReviewDetail from "../../_components/review/ShowReviewDetail"
+
 interface review{
   reviewId:number,
   reviewContent:string,
@@ -19,27 +20,25 @@ interface Detail{
     id:number
 }
 const ReviewDetails: React.FC<Detail> = ({id}) => {
-
-    
-    const [reviews,setReviews]=useState<review[]>([])
-    const [show,setshow]=useState(true);
-    const [page_number,set_page_number]=useState(32);
-    const [current_page,set_current_page]=useState(1);
+  const [reviews,setReviews]=useState<review[]>([])
+  const [show,setshow]=useState(true);
+  const [page_number,set_page_number]=useState(32);
+  const [current_page,set_current_page]=useState(1);
 
 
-    const [show_page,set_show_page]=useState(false);
+  const [show_page,set_show_page]=useState(false);
 
-    const [content,set_content]=useState<string>();
-     const handledetailpage=(x:boolean)=>{
-        set_show_page(x);
-     }
-
-     const handlepagechange=(x:number)=>{
-        set_current_page(x);
-     }
+  const [content,set_content]=useState<string>();
+  const handledetailpage=(x:boolean)=>{
+      set_show_page(x);
+  }
+  
+  const handlepagechange=(x:number)=>{
+      set_current_page(x);
+  }
 
      //api에서 변수를 받아서 string꼴의 별점을 반환하는 함수.
-     function makestar(score:number){
+    function makestar(score:number){
       const a=document.createElement("a");
       score=Math.floor(score/2);
       let star="";
@@ -49,10 +48,8 @@ const ReviewDetails: React.FC<Detail> = ({id}) => {
       return star;
     };
 
-   
     console.log(id);
     console.log(9.9/2)
-
 
     useEffect(()=>{
       async function res(id){
@@ -68,7 +65,6 @@ const ReviewDetails: React.FC<Detail> = ({id}) => {
           return res.json();
         })
         
-       
         if(data.success){
           setshow(true);
           setReviews(data.data.content)
@@ -76,12 +72,8 @@ const ReviewDetails: React.FC<Detail> = ({id}) => {
         else{
           setshow(false);
         }
-
       }
-  
-
       res(id);
-     
     },[current_page])
   const show_review_page=(contents:string)=>{
       set_show_page(true);
@@ -90,37 +82,41 @@ const ReviewDetails: React.FC<Detail> = ({id}) => {
     }
   const handle_page_show=(x:boolean)=>{
     set_show_page(x);
-       }
+      }
+
   return (
-    <div className="w-[200px] h-[200px] bg-red-100">
-        {//페이징 된 리뷰데이틀 받아와서 나열하는 과정
-        //나열 될 내용은 마트이름 별점 으로 우선 정해놓음.
-        // 아래의 li에 대해서 디자인을 해주면될듯.
-        //show 값이 true면 나열하고 아니라면 그냥 현재페이지를 표시하는 숫자를 넣는다
-        //원하실대로 show값이 false 즉 아무 페이지도 없을때를 만드셔도 된다.
-          show ? reviews.map(x=>(
-            <li key={x.reviewId}  onClick={()=>{show_review_page(x.reviewContent)}}className="w-[200px] h-[50px]">
-                x.reviewContent+{makestar(x.score)}
-
+  <div className="w-full max-w-4xl mx-auto bg-white shadow-lg p-6 rounded-lg">
+    {
+      // 페이징된 리뷰 데이터를 받아와 나열하는 과정
+      show ? reviews.map(x => (
+        <li key={x.reviewId} 
+            className="flex justify-between items-center p-4 hover:bg-gray-100 rounded-md cursor-pointer transition-colors"
+            onClick={() => { show_review_page(x.reviewContent) }}>
+          <span className="text-gray-800 text-sm">
+            {x.reviewContent}
+          </span>
+          <span className="text-yellow-500 text-lg">
+            {makestar(x.score)}
+          </span>
+        </li>
+      )) :
+      <div className="text-center text-gray-500">
+        {current_page}
+      </div>
+    }
     
-            </li>
+    {
+      // 클릭 시 해당 리뷰 내용을 보여주는 모달창
+      show_page && 
+      <ShowReviewDetail content={content} setting_show={handle_page_show}/>
+    }
 
-          )):
-          <div>{current_page}</div>
-        }
-      
-        {
-
-          //li 태그에서클릭시 해당되는 글의 내용을 보여주는 모달창.
-          show_page ? <ShowReviewDetail content={content} setting_show={handle_page_show}/> :<div></div>
-        }
-      
-
-      {//애같은경우에는 게시판 에서보면 아래의 번호로 다음 번호대의 게시물들을 보여주는것.
-      <ReviewPagnation set_current_page={handlepagechange} page_number={page_number}/>}
-    </div>
-  )
+    {
+      // 페이지네이션 컴포넌트
+      <ReviewPagnation set_current_page={handlepagechange} page_number={page_number}/>
+    }
+  </div>
+)
 }
-            
 
 export default ReviewDetails;

@@ -3,13 +3,13 @@ import React ,{ useEffect,useState } from 'react';
 
 
 interface props{
-   set_current_page: (page: number) => void,
-   page_number:number
+  set_current_page: (page: number) => void,
+  page_number:number
 }
 const ReviewPagnation: React.FC<props>=({set_current_page,page_number})=>{
     const [prev_num,set_prev_num]=useState(1);
     const [next_num,set_next_num]=useState(10); 
-   
+  
     
     
     
@@ -18,15 +18,15 @@ const ReviewPagnation: React.FC<props>=({set_current_page,page_number})=>{
     //이걸로 버튼 생김새를 조절하면된다.
     const styles="flex page_btn w-[15px] h-[20px]  mx-[1px] rounded-lg justify-items-center justify-center";
     
-    
-    
-    
+
     let next_btn=document.getElementById("next_btn");
     let prev_btn=document.getElementById("prev_btn");
     
     
     //애는 다음페이지,이전페이지를 보여주는 버튼의 활성화여부와 그에따른 색깔을 바꿔주는 함수.
     const btn_disabled_setting=(id:string,ans:boolean)=>{
+      const next_btn = document.getElementById(id) as HTMLButtonElement;
+      const prev_btn = document.getElementById(id) as HTMLButtonElement;
       if(id==="next_btn"){
         next_btn.disabled=ans
         if(ans){
@@ -37,7 +37,7 @@ const ReviewPagnation: React.FC<props>=({set_current_page,page_number})=>{
         }
       }
       else{
-        prev_btn.disabeld=ans
+        prev_btn.disabled=ans
         if(ans){
           prev_btn.style.color="gray"
         }
@@ -274,4 +274,3 @@ const ReviewPagnation: React.FC<props>=({set_current_page,page_number})=>{
 
 
 export default ReviewPagnation;
-

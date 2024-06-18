@@ -1,12 +1,12 @@
 import KakaoCallback from '@/app/_components/kakaocallback';
-import React from 'react'
+import React, { Suspense } from 'react'
 
 const Page: React.FC = () => {
   return (
     <div className="h-screen flex justify-center items-center">
-      <KakaoCallback/>
+      <Suspense>
+        <KakaoCallback/>
+      </Suspense>
     </div>
   )
 }
-
-export default Page;
