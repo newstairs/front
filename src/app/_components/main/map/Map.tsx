@@ -64,12 +64,43 @@ const KakaoMapComponent = ({center}) => {
   const [zoom,setzoom]=useState(true);
  
   const [function_memmory,set_function_memmorty]=useState(null);
+
+
+  const [center_marker,set_center_marker]=useState(null);
+
+  const [marker_save_maps,set_marker_save_map]=useState(null);
+
+  const [over_lay_save_maps,set_overlay_save_maps]=useState(null);
+
+  const [marker_tracker_maps,set_marker_tarcker]=useState(null);
+
+  const [place_findeds,set_place_finded]=useState(null);
+
+  const [marker_function_save_maps,set_marker_function_save_maps]=useState(null);
+
   // 마커 트래킹에 필요한 변수들
   var place_finded=new Map();//polyline 데이터 저장.
   var marker_save_map:Map<string,any>=new Map();//marker랑 place 데이터 저장
   var overlay_save_map:Map<string,any>=new Map();//오버레이 데이터 저장.
   var marker_tracker_map=new Map();//마커트래커 저장.
   var marker_function_save_map:Map<any,any>=new Map();//마커에 등록된 이벤트 지울떄 쓰는 함수.
+
+
+  function clearall(){
+    let d=document.getElementsByClassName("tracker");
+
+    console.log("document:",d);
+    if(d.length!==0){
+        
+         
+    for(const x of Array.from(d)){
+        
+        x.remove();
+    }}
+    
+  }
+
+
 
   const closeandopen=()=>{
     const btn=document.getElementById("closeopenbtn");
@@ -85,6 +116,7 @@ const KakaoMapComponent = ({center}) => {
       btn.className="w-[50px] h-[50px] bg-red-100 absolute top-[50px] right-0 z-50"
     }
   }
+
 
   // 함수 모음 
   // 함수 작동 흐름 (getLocation --> async1(기상청 날씨 api) --> async2(트래커 경로 표시, 마커 오버레이 ) --> makemarker)
@@ -111,7 +143,7 @@ const KakaoMapComponent = ({center}) => {
 
     tracker.appendChild(icon);
     tracker.appendChild(balloon);
-
+    console.log("map:",map);
     map.getNode().appendChild(tracker);
 
     // tracker 클릭시 target의 위치를 중심좌표로 변경
@@ -132,7 +164,7 @@ const KakaoMapComponent = ({center}) => {
       }
       else {
         // 영역 밖이면 위치 계산 시작
-        let pos = proj.containPointFromCoords(target.getPosition());//TooltipMarker 위치
+        let pos = proj.containerPointFromCoords(target.getPosition());//TooltipMarker 위치
         let center = proj.containerPointFromCoords(map.getCenter());//지도 중심 위치
         let sw = proj.containerPointFromCoords(bounds.getSouthWest());//현재 보이는 지도의 남서쪽 화면 좌표
         let ne = proj.containerPointFromCoords(bounds.getNorthEast());//현재 보이는 지도의 북동쪽 화면 좌표
@@ -247,20 +279,46 @@ const KakaoMapComponent = ({center}) => {
     }
   }
 
+  function timechange(time:number) :string{
+    var min:number|string=Math.floor(time/60);
+    var second:number|string=time-min*60;
+    var times="";
+
+    if(min<10){
+
+        min="0"+min;
+
+
+    }
+    if(second<10){
+        second="0"+second
+    }
+
+    return min+"분"+second+"초";
+    
+  }
+
   // 현 위치 정보 기억
   let origin_cord: string[];
   // geolocation을 이용해 현 위치 불러오기
   function getLocation() {
     if(navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(function showPosition(position:geolocationposition) {
-        let latitude = position.coords.latitude;
-        let longitude = position.coords.longitude;
-        origin_cord=[latitude.toString(),longitude.toString()]
-        // let locPosition = new kakaoMap.LatLng(latitude, longitude);
-        
-        if(center.lat!==null && center.lng!==null){
 
-            origin_cord[center.lat.toString(),center.lng.toString()]
+        // let locPosition = new kakaoMap.LatLng(latitude, longitude);
+        console.log("center:",center.lat.toString().substring(0),center.lng.toString().substring(0));        
+        if(center.lat!==null && center.lng!==null){
+            console.log(center.lat.toString().substring(0).length);
+            origin_cord=[center.lat.toString().substring(0),center.lng.toString().substring(0)]
+            
+          }
+        else{
+          let latitude = position.coords.latitude;
+          let longitude = position.coords.longitude;
+          origin_cord=[latitude.toString(),longitude.toString()]
+          center.lat=latitude;
+          center.lng=longitude;
+          
         }
         // 지도 중심을 사용자 위치로 이동시킵니다
 
@@ -297,6 +355,7 @@ const KakaoMapComponent = ({center}) => {
   // 기상청 날씨정보 api 함수
   async function async1() {
     console.log("async1");
+ 
     async function getmarker(origin_name: string) {
       let serviceKey = process.env.NEXT_PUBLIC_serviceKey;
       let date = new Date();
@@ -317,17 +376,19 @@ const KakaoMapComponent = ({center}) => {
 
       place_data = await getbycategory(Number(origin_cord[1]), Number(origin_cord[0]));
       const mart_data = place_data.documents[0];
+      console.log(place_data);
       console.log("mart_around:", mart_data);
+      let doc_list=[];
+      for(const x of place_data.documents){
+        doc_list.push({martName:x.place_name,martAddress:x.road_address_name})
+      };
       let answer = await fetch("http://localhost:3000/marts", {
         method: "post",
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer "+localStorage.getItem("access_token")
         },
-        body: JSON.stringify([{
-          martName: mart_data.place_name,
-          martAddress: mart_data.road_address_name
-        }])
+        body: JSON.stringify(doc_list)
       })
       .then((res) => {return res.json()})
       localStorage.setItem("mart_around", JSON.stringify(answer.data));
@@ -398,6 +459,8 @@ const KakaoMapComponent = ({center}) => {
         for (var i=0; i < place_data["documents"].length; i++) {
           displayMarker(place_data["documents"][i]);
         }
+
+        set_marker_save_map(()=>marker_save_map);
       }
 
       if (weatherdata["특보데이터"]  === null) {
@@ -419,6 +482,9 @@ const KakaoMapComponent = ({center}) => {
             let textNode = document.createElement("span");
             textNode.textContent=(weather_local_data[local_data]+"mm");
             textNode.className="inline";
+            if(doc1.children[1]){
+              doc1.children[1].remove();
+            }
             doc1.appendChild(textNode);
             break;
           case "T1H":
@@ -427,6 +493,9 @@ const KakaoMapComponent = ({center}) => {
             textNode2.textContent=(weather_local_data[local_data]+"°C");
             textNode2.className="inline";
             const doc2=document.getElementById(local_data)
+            if(doc2.children[1]){
+              doc2.children[1].remove();
+            }
             doc2.appendChild(textNode2)
             break;
           case "VEC":
@@ -435,6 +504,9 @@ const KakaoMapComponent = ({center}) => {
             textNode3.textContent=(weather_local_data[local_data]+"m/s");
             textNode3.className="inline";
             const doc3=document.getElementById(local_data)
+            if(doc3.children[1]){
+              doc3.children[1].remove();
+            }
             doc3.appendChild(textNode3);
             break;
         }
@@ -528,6 +600,8 @@ const KakaoMapComponent = ({center}) => {
         });
         console.log("markercenter");
         //center_marker_save_map.set("center",marker);
+
+        set_center_marker(()=>marker);
       }
     
 
@@ -577,6 +651,7 @@ const KakaoMapComponent = ({center}) => {
 
   }
   async function getbycategory (x: number, y: number) {
+    console.log(x,y);
     const data = await fetch(`https://dapi.kakao.com/v2/local/search/category.json?category\_group\_code=MT1&x=${x}&y=${y}&radius=1000`, {
       method: "GET",
       headers: {
@@ -816,7 +891,7 @@ const KakaoMapComponent = ({center}) => {
         console.log("linepath:",linepath);
 
         console.log("mart_price_all_data:",mart_price_all_data);
-        mart_price_all_data=mart_price_all_data.data;
+        //mart_price_all_data=mart_price_all_data.data;
         console.log("mart_price_all_data:",mart_price_all_data);
         console.log("position:",position);
         makemarker(pos_data,linepath,position["martId"],mart_price_all_data)
@@ -825,6 +900,12 @@ const KakaoMapComponent = ({center}) => {
         console.error('Error:', error);
       }
     }
+
+
+    set_overlay_save_maps(()=>overlay_save_map);
+    set_place_finded(()=>place_finded);
+    set_marker_function_save_maps(()=>marker_function_save_map);
+    set_marker_tarcker(()=>marker_tracker_map);
   }
   // async2 내장함수
   async function makemarker (pos_data:any,linepath:any,martid:number,mart_price_all_data:any) {
@@ -1030,6 +1111,35 @@ const KakaoMapComponent = ({center}) => {
     // 만약 이동할 거리가 지도 화면보다 크면 부드러운 효과 없이 이동합니다
     map.panTo(moveLatLon); 
   }
+  function reset_maps(){
+
+    if(over_lay_save_maps!==null){
+      for(const key of over_lay_save_maps.keys()){
+        console.log("key test:",key);
+        place_findeds.get(key).setMap(null);
+        over_lay_save_maps.get(key).setMap(null);
+      }
+  }
+    if(marker_function_save_maps!==null){
+      for(const key of marker_function_save_maps.keys()){
+       window.kakao.maps.event.removeListener(key,'click',marker_function_save_maps.get(key));
+      }
+    }
+    if(marker_tracker_maps!==null){
+      for(const x of marker_tracker_maps.values()){
+       x.stop();//마커 트레이서기능을 종료시키는 과정.
+      }
+    }
+    if(marker_save_maps!==null){
+      for(const x of marker_save_maps.values()){
+        x[0].setMap(null);
+      }
+    }
+    if(center_marker!==null){
+      center_marker.setMap(null);
+    }
+
+  }
 
   // 카카오맵 load hook
   useEffect(()=>{
@@ -1042,8 +1152,13 @@ const KakaoMapComponent = ({center}) => {
         level: 3,
       };
       const newMap = new kakaoMap.Map(container, options);
-      setMap(newMap);
+      setMap(()=>newMap);
+
+
+      
     }
+    reset_maps();
+
     if(map) {
       const geocoder = new kakaoMap.services.Geocoder();
     }
@@ -1109,7 +1224,7 @@ const KakaoMapComponent = ({center}) => {
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" className="w-12 h-12"><path fill="#74C0FC" d="M192 512C86 512 0 426 0 320C0 228.8 130.2 57.7 166.6 11.7C172.6 4.2 181.5 0 191.1 0h1.8c9.6 0 18.5 4.2 24.5 11.7C253.8 57.7 384 228.8 384 320c0 106-86 192-192 192zM96 336c0-8.8-7.2-16-16-16s-16 7.2-16 16c0 61.9 50.1 112 112 112c8.8 0 16-7.2 16-16s-7.2-16-16-16c-44.2 0-80-35.8-80-80z"/></svg>
         </div>
       </div>
-      <button id="closeopenbtn" className="w-[50px] h-[50px] bg-red-100 absolute top-[50px] right-0 z-50"onClick={()=>{closeandopen()}}>close</button>
+      <button id="closeopenbtn" className="w-[50px] h-[50px] bg-red-100 absolute top-[50px] right-0 z-30"onClick={()=>{closeandopen()}}>close</button>
 
       {/* Kakao Map */}
       <div id="map" className="relative inset-0 w-full h-full"></div>

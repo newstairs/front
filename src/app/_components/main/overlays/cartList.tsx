@@ -207,16 +207,18 @@ const CartList: React.FC = () => {
           <p className="text-gray-500">아이템 없음.</p>
         )}
 
-        <button
-          onClick={() => clicketst()}
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg mt-4"
-        >
-          {location !== null ? "지도 보기" : "hello?"}
-        </button>
-        {location !== null && <Map location={location} />}
+
       </div>
     </div>
   );
 };
 
 export default CartList;
+/*
+<button
+          onClick={() => clicketst()}
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg mt-4"
+        >
+          {location !== null ? "지도 보기" : "hello?"}
+        </button>
+        {location !== null && <Map location={location} />}*/ 
