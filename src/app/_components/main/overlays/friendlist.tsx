@@ -4,17 +4,6 @@ import React, { useEffect, useState } from 'react';
 interface friend_data{
     uuid:string,
     name:string
-
-  }
-  interface friend_data_list{
-    friend_datas:friend_data[]
-  }
-
-interface Friendlist{
-    frienddata:friend_data_list
-    item_list:items
-    handle_friend_set:()=>void
-
 }
 
 interface CartItem{
@@ -24,9 +13,12 @@ interface CartItem{
     quantity:number
 }
 
+interface FriendListProps {
+    frienddata: friend_data[];
+    item_list: CartItem[];
+}
 
-const FriendList: React.FC<Friendlist> = ({frienddata,item_list,handle_friend_set}) => {
-
+const FriendList: React.FC<FriendListProps> = ({frienddata,item_list}) => {
     console.log("item_list:",item_list);
     const send_cartlist_to_friend=async ()=>{
         let x=document.querySelectorAll(".friend_list");
@@ -58,31 +50,23 @@ const FriendList: React.FC<Friendlist> = ({frienddata,item_list,handle_friend_se
 
     const find_memeber=()=>{
 
-
-        let doc=document.getElementById("member_find");
-
-
-        let doc2=document.getElementById("show_box");
-        if(doc.value===""){
-            doc2.className="absolute hidden w-full  bg-red-400 overflow-scroll overflow-x-hidden"
-
-        }
-        else{
-            const find_list=x.filter((mem)=>{
-                if(mem.name.includes(doc.value)){
-                    return true;
-                }
-                return false;
-            })
+        let doc=document.getElementById("member_find") as HTMLInputElement;
         
-            
-            let doc2_child=Array.from(doc2.children)
-            for(let x of doc2_child){
-                x.remove();
+        const find_list=frienddata.filter((mem)=>{
+            if(mem.name===doc.value){
+                return true;
             }
+            return false;
+        })
         
-            if(find_list.length>0){  
-            doc2.className="absolute w-full bg-red-400 overflow-scroll overflow-x-hidden z-20"
+        let doc2=document.getElementById("show_box");
+        let doc2_child=Array.from(doc2.children)
+        for(let x of doc2_child){
+            x.remove();
+        }
+        
+        if(find_list.length>0){  
+            doc2.className="absolute w-[200px]  bg-red-400 overflow-scroll overflow-x-hidden"
             console.log("findlist:",find_list);
             for(let x of find_list){
                 let doc3=document.createElement("div");
@@ -96,52 +80,21 @@ const FriendList: React.FC<Friendlist> = ({frienddata,item_list,handle_friend_se
                 
             }
             
-            }
-            else{
-                doc2.className="absolute hidden w-[200px]  bg-red-400 overflow-scroll overflow-x-hidden"
-            }
+        }
+        else{
+            doc2.className="absolute hidden w-[200px]  bg-red-400 overflow-scroll overflow-x-hidden"
         }
     }
-    const mart_list=JSON.parse(window.localStorage.getItem("mart_around"));
 
 
- return  (
-    <div className="absolute w-[300px] h-[300px]   bg-slate-500 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-100 overflow-scroll overflow-x-hidden "> 
-
+    return  (
+    <div className="absolute w-[200px] h-[200px]   bg-slate-500 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-100 overflow-scroll overflow-x-hidden "> 
         
         
-        <input id="member_find"className="rounded-lg w-full border-[1px] my-[2px] border-black" placeholder="검색칸" type="text" onChange={()=>{find_memeber()}}></input>
-        <div id="show_box" className="absolute hidden w-full  bg-red-400 overflow-scroll overflow-x-hidden"></div>
-        <button className="bg-white w-1/2 sticky top-[0px] right-0 rounded-lg"onClick={()=>{handle_friend_set()}}>닫기</button>
-        <button className="w-1/2 bg-red-500 sticky top-[0px] left-0 rounded-lg"onClick={()=>{send_cartlist_to_friend()}}>제출하기</button>
-        <div className="flex justify-normal h-[300px]">
-        <div id="show_mart_list" className="w-1/2 h-full bg-green-100">
-            {
-                <ul>
-                    {
-                        mart_list.map((x)=>(
-
-                            <li id={x.martAddress} key={x.id} className="friend_list bg-white rounded-lg w-full h-[20px]">
-                            <input className="checkbox" type="checkbox"></input>{x.martName}
-                                </li>
-
-
-                        ))
-                    }
-
-
-
-                </ul>
-            }
-
-
-
-        </div>
-        
-        
-        <div id="show_friend_list" className="w-1/2 bg-blue-300 h-full">
+        <input id="member_find" placeholder="검색칸" type="text" onChange={()=>{find_memeber()}}></input>
+        <div id="show_box" className="absolute hidden w-[200px]  bg-red-400 overflow-scroll overflow-x-hidden"></div>
         {
-            <ul>
+            <ul className="">
                 {
                     frienddata.map(x=>(
 
@@ -154,10 +107,8 @@ const FriendList: React.FC<Friendlist> = ({frienddata,item_list,handle_friend_se
                 }
             </ul>
         }
-        </div>
-        </div>
 
-        
+        <button onClick={()=>{send_cartlist_to_friend()}}>제출하기</button>
 
     </div>)
 

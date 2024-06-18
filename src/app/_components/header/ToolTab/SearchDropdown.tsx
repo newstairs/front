@@ -55,7 +55,6 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({ onSetCenter }) => {
   const handleSetCenter = (lat, lng) => {
     onSetCenter({lat, lng});
     closeModal(); // 설정 후 모달을 닫습니다.
-    setIsOpen(!isOpen)
   };
 
   return (

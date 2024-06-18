@@ -136,15 +136,21 @@ const CartList: React.FC = () => {
     }
   }
 
+  const [items, setItem] = useState<CartItem[]>([]);
 
-
-  function handlefriendset(){
-    setfriend(false)
-    console.log("setfriend");
-  }
-
-  const [items, setItem] = useState()
-
+  // useEffect(() => {
+  //   const fetchdata = async () => {
+  //     const data = await fetch("http://localhost:3000/cart", {
+  //       method: "GET",
+  //       headers: {
+  //         Authorization: "Bearer " + localStorage.getItem("access_token")
+  //       }
+  //     }).then((res) => { return res.json(); })
+  //     setItem(data.data);
+  //     data.data.length > 0 ? sethasitems(true) : sethasitems(false)
+  //   }
+  //   fetchdata()
+  // }, [])
   useEffect(() => {
   const fetchdata = async () => {
   const response = await fetch("http://localhost:3000/cart", {
@@ -181,10 +187,7 @@ fetchdata()
           친구에게 보내기
         </button>
 
-
-        {friend_onoff && <FriendList frienddata={friendlist} item_list={items} handle_friend_set={handlefriendset} />}
-
-       
+        {friend_onoff && <FriendList frienddata={friendlist} item_list={items} />}
 
         {hasitems ? (
           <ul className="flex flex-col items-center divide-y divide-gray-200 space-y-4">
@@ -227,12 +230,9 @@ fetchdata()
           <p className="text-gray-500">장바구니에 품목을 담아주세요</p>
         )}
 
-
       </div>
     </div>
   );
 };
 
-
 export default CartList;
-

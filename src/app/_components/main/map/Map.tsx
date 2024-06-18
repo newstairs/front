@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useMap } from './MapProvider'
 import '../../../styles/mapmarker.css'
 import { text } from 'stream/consumers';
-import WeatherModal from './weathermodal';
+
 // interface 정의
 interface documentarr {
   address_name:string,
@@ -57,34 +57,10 @@ interface qa {
 const KakaoMapComponent = ({center}) => {
   // kakao map api script kakaoMap 객체 가져오기
   const kakaoMap = useMap();
-  const[zoom_func,set_zoom_func]=useState(null);
+
   // 상태 관리
   const [map, setMap] = useState(null); // map 상태를 초기화합니다.
- 
   const [zoom,setzoom]=useState(true);
- 
-  const [function_memmory,set_function_memmorty]=useState(null);
-
-  const [weather_modal,set_weather_modal]=useState(true);
-
-  function wether_modal_truth(){
-    set_weather_modal(()=>false)
-  }
-
-  const [center_marker,set_center_marker]=useState(null);
-
-  const [marker_save_maps,set_marker_save_map]=useState(null);
-
-  const [over_lay_save_maps,set_overlay_save_maps]=useState(null);
-
-  const [marker_tracker_maps,set_marker_tarcker]=useState(null);
-
-  const [place_findeds,set_place_finded]=useState(null);
-
-  const [marker_function_save_maps,set_marker_function_save_maps]=useState(null);
-
-  const [over_lay_main_list,set_over_lay_main_list]=useState<any[]>([]);
-  const [weather_special,set_weater_special]=useState(null);
 
   // 마커 트래킹에 필요한 변수들
   var place_finded=new Map();//polyline 데이터 저장.
@@ -92,23 +68,6 @@ const KakaoMapComponent = ({center}) => {
   var overlay_save_map:Map<string,any>=new Map();//오버레이 데이터 저장.
   var marker_tracker_map=new Map();//마커트래커 저장.
   var marker_function_save_map:Map<any,any>=new Map();//마커에 등록된 이벤트 지울떄 쓰는 함수.
-
-
-  function clearall(){
-    let d=document.getElementsByClassName("tracker");
-
-    console.log("document:",d);
-    if(d.length!==0){
-        
-         
-    for(const x of Array.from(d)){
-        
-        x.remove();
-    }}
-    
-  }
-
-
 
   const closeandopen=()=>{
     const btn=document.getElementById("closeopenbtn");
@@ -124,7 +83,6 @@ const KakaoMapComponent = ({center}) => {
       btn.className="w-[50px] h-[50px] bg-red-100 absolute top-[50px] right-0 z-50"
     }
   }
-
 
   // 함수 모음 
   // 함수 작동 흐름 (getLocation --> async1(기상청 날씨 api) --> async2(트래커 경로 표시, 마커 오버레이 ) --> makemarker)
@@ -148,10 +106,10 @@ const KakaoMapComponent = ({center}) => {
     icon.className = 'icon';
   let balloon = document.createElement('div');
     balloon.className = 'balloon';
-    tracker.appendChild(balloon);
+
     tracker.appendChild(icon);
-    
-    console.log("map:",map);
+    tracker.appendChild(balloon);
+
     map.getNode().appendChild(tracker);
 
     // tracker 클릭시 target의 위치를 중심좌표로 변경
@@ -172,7 +130,7 @@ const KakaoMapComponent = ({center}) => {
       }
       else {
         // 영역 밖이면 위치 계산 시작
-        let pos = proj.containerPointFromCoords(target.getPosition());//TooltipMarker 위치
+        let pos = proj.containPointFromCoords(target.getPosition());//TooltipMarker 위치
         let center = proj.containerPointFromCoords(map.getCenter());//지도 중심 위치
         let sw = proj.containerPointFromCoords(bounds.getSouthWest());//현재 보이는 지도의 남서쪽 화면 좌표
         let ne = proj.containerPointFromCoords(bounds.getNorthEast());//현재 보이는 지도의 북동쪽 화면 좌표
@@ -287,55 +245,23 @@ const KakaoMapComponent = ({center}) => {
     }
   }
 
-  function timechange(time:number) :string{
-    var min:number|string=Math.floor(time/60);
-    var second:number|string=time-min*60;
-    var times="";
-
-    if(min<10){
-
-        min="0"+min;
-
-
-    }
-    if(second<10){
-        second="0"+second
-    }
-
-    return min+"분"+second+"초";
-    
-  }
-
   // 현 위치 정보 기억
   let origin_cord: string[];
   // geolocation을 이용해 현 위치 불러오기
   function getLocation() {
     if(navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(function showPosition(position:geolocationposition) {
-
+        let latitude = position.coords.latitude;
+        let longitude = position.coords.longitude;
         // let locPosition = new kakaoMap.LatLng(latitude, longitude);
-        console.log("center:",center.lat.toString().substring(0),center.lng.toString().substring(0));        
-        if(center.lat!==null && center.lng!==null){
-            console.log(center.lat.toString().substring(0).length);
-            origin_cord=[center.lat.toString().substring(0),center.lng.toString().substring(0)]
-            
-          }
-        else{
-          let latitude = position.coords.latitude;
-          let longitude = position.coords.longitude;
-          origin_cord=[latitude.toString(),longitude.toString()]
-          center.lat=latitude;
-          center.lng=longitude;
-          
-        }
-        // 지도 중심을 사용자 위치로 이동시킵니다
+        let locPosition = new kakaoMap.LatLng(37.654733159968, 127.07610170472);
 
-        let locPosition = new kakaoMap.LatLng(Number(origin_cord[0]), Number(origin_cord[1]));
+        // 지도 중심을 사용자 위치로 이동시킵니다
         map.setCenter(locPosition);
         console.log("현 위치를 성공적으로 불러왔습니다!")
 
         // origin_cord = [latitude.toString(), longitude.toString()];
-        //origin_cord=["37.654733159968","127.07610170472"]
+        origin_cord=["37.654733159968","127.07610170472"]
         console.log("origin_cord: ", origin_cord);
 
         async1();
@@ -363,7 +289,6 @@ const KakaoMapComponent = ({center}) => {
   // 기상청 날씨정보 api 함수
   async function async1() {
     console.log("async1");
- 
     async function getmarker(origin_name: string) {
       let serviceKey = process.env.NEXT_PUBLIC_serviceKey;
       let date = new Date();
@@ -384,19 +309,17 @@ const KakaoMapComponent = ({center}) => {
 
       place_data = await getbycategory(Number(origin_cord[1]), Number(origin_cord[0]));
       const mart_data = place_data.documents[0];
-      console.log(place_data);
       console.log("mart_around:", mart_data);
-      let doc_list=[];
-      for(const x of place_data.documents){
-        doc_list.push({martName:x.place_name,martAddress:x.road_address_name})
-      };
       let answer = await fetch("http://localhost:3000/marts", {
         method: "post",
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer "+localStorage.getItem("access_token")
         },
-        body: JSON.stringify(doc_list)
+        body: JSON.stringify([{
+          martName: mart_data.place_name,
+          martAddress: mart_data.road_address_name
+        }])
       })
       .then((res) => {return res.json()})
       localStorage.setItem("mart_around", JSON.stringify(answer.data));
@@ -467,20 +390,15 @@ const KakaoMapComponent = ({center}) => {
         for (var i=0; i < place_data["documents"].length; i++) {
           displayMarker(place_data["documents"][i]);
         }
-
-        set_marker_save_map(()=>marker_save_map);
       }
 
       if (weatherdata["특보데이터"]  === null) {
         console.log("특보데이터가 없습니다!");
-        set_weater_special(()=>null)
       }
       else {
         console.log(weatherdata["특보데이터"]);
         console.log(weather_local_data);
         console.log("현재" + weather_area_code[stnId] + "지역에" + weatherdata["특보데이터"] + "가 발생했습니다.")
-        let data={weathers:"현재 " + weather_area_code[stnId] + " 지역에 " + weatherdata["특보데이터"] + "가 발생했습니다."};
-        set_weater_special(()=>data)
       }
       for(const local_data of Object.keys(weather_local_data)) {
         switch (local_data){
@@ -493,9 +411,6 @@ const KakaoMapComponent = ({center}) => {
             let textNode = document.createElement("span");
             textNode.textContent=(weather_local_data[local_data]+"mm");
             textNode.className="inline";
-            if(doc1.children[1]){
-              doc1.children[1].remove();
-            }
             doc1.appendChild(textNode);
             break;
           case "T1H":
@@ -504,9 +419,6 @@ const KakaoMapComponent = ({center}) => {
             textNode2.textContent=(weather_local_data[local_data]+"°C");
             textNode2.className="inline";
             const doc2=document.getElementById(local_data)
-            if(doc2.children[1]){
-              doc2.children[1].remove();
-            }
             doc2.appendChild(textNode2)
             break;
           case "VEC":
@@ -515,71 +427,10 @@ const KakaoMapComponent = ({center}) => {
             textNode3.textContent=(weather_local_data[local_data]+"m/s");
             textNode3.className="inline";
             const doc3=document.getElementById(local_data)
-            if(doc3.children[1]){
-              doc3.children[1].remove();
-            }
             doc3.appendChild(textNode3);
             break;
         }
       }
-     
-      displayCenterMarker(center.lat,center.lng);
-      function zoomfunc(){
-        console.log("zoom")
-        setzoom(zoom=>{
-            const newzoom=!zoom;
-            map.setZoomable(newzoom);
-            if(newzoom!==true){
-                zoom_map.textContent="-";
-                
-                
-
-            }
-            else{
-                zoom_map.textContent="+"
-
-               
-
-            }
-
-            return newzoom;
-        })
-
-      }
-      let zoom_map=document.getElementById("map_zoom");
-      if(zoom_func===null){
-        console.log("event memeory")
-        set_zoom_func(()=>zoomfunc);
-        
-      }
-      else{
-      
-        
-        zoom_map.removeEventListener("click",zoom_func);
-        
-        set_zoom_func(()=>zoomfunc);
-      }
-      
-      zoom_map.addEventListener("click",zoom_func);
-
-      const btn = document.getElementById("showmarker");
-      function activeasync2(){
-        async2();
-        console.log("button")
-      }
-      if(function_memmory===null){
-        console.log("event memeory")
-        set_function_memmorty(()=>activeasync2);
-      }
-      else{
-          btn.removeEventListener("click",function_memmory);
-         set_function_memmorty(()=>activeasync2);
-      }
-
-      btn.addEventListener("click",activeasync2)
-
-
-
 
       // place_data로 좌표를 불러와 해당 좌표에 마커를 만드는 과정
       function displayMarker (place: any) {
@@ -591,31 +442,6 @@ const KakaoMapComponent = ({center}) => {
         marker_save_map.set(place.place_name, [marker,place])
       }
       console.log("geocoder End!");
-
-
-
-
-      function displayCenterMarker(lat:number,lng:number){
-
-        console.log("latlng:",lat,lng);
-        var imageSrc = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Me_bank_logo15.png/225px-Me_bank_logo15.png" // 마커이미지의 주소입니다    
-        let imageSize = new kakaoMap.Size(64, 69) // 마커이미지의 크기입니다
-        let imageOption = {offset: new kakaoMap.Point(27, 69)}; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다
-        
-        var markerImage = new kakaoMap.MarkerImage(imageSrc, imageSize, imageOption)
-        var marker = new kakaoMap.Marker({
-            map: map,
-            position: new kakaoMap.LatLng(lat,lng), 
-            image:markerImage
-
-        });
-        console.log("markercenter");
-        //center_marker_save_map.set("center",marker);
-
-        set_center_marker(()=>marker);
-      }
-    
-
     }
     origin_name = await convertcoordtoname(Number(origin_cord[1]),Number(origin_cord[0]));
     getmarker(origin_name);
@@ -662,7 +488,6 @@ const KakaoMapComponent = ({center}) => {
 
   }
   async function getbycategory (x: number, y: number) {
-    console.log(x,y);
     const data = await fetch(`https://dapi.kakao.com/v2/local/search/category.json?category\_group\_code=MT1&x=${x}&y=${y}&radius=1000`, {
       method: "GET",
       headers: {
@@ -764,11 +589,10 @@ const KakaoMapComponent = ({center}) => {
     }
     var data=await fetch(`https://dapi.kakao.com/v2/local/geo/coord2address.json?x=${x}&y=${y}`,opt)
     .then((res)=>{return res.json()})
-    try{
+
     return (
       data["documents"][0]["road_address"]["address_name"]
-    );}
-    catch(error){console.log("도로명주소가없어요");}
+    );
   }
 
   // async2
@@ -902,7 +726,7 @@ const KakaoMapComponent = ({center}) => {
         console.log("linepath:",linepath);
 
         console.log("mart_price_all_data:",mart_price_all_data);
-        //mart_price_all_data=mart_price_all_data.data;
+        mart_price_all_data=mart_price_all_data.data;
         console.log("mart_price_all_data:",mart_price_all_data);
         console.log("position:",position);
         makemarker(pos_data,linepath,position["martId"],mart_price_all_data)
@@ -911,30 +735,6 @@ const KakaoMapComponent = ({center}) => {
         console.error('Error:', error);
       }
     }
-
-
-    set_overlay_save_maps(()=>overlay_save_map);
-    set_place_finded(()=>place_finded);
-    set_marker_function_save_maps(()=>marker_function_save_map);
-    set_marker_tarcker(()=>marker_tracker_map);
-    /*for(const x of over_lay_main_list){
-
-      x.addEventListener("click",(event)=>{
-        console.log("z-index:",x===event.target)
-
-        over_lay_main_list.map(x=>{
-          if(x===event.target){
-            x.className="bg-white rounded-lg shadow-lg p-4 w-[200px] h-[250px] relative z-15"
-          }
-          else{
-            x.className="bg-white rounded-lg shadow-lg p-4 w-[200px] h-[250px] relative"
-          }
-        })
-      })
-      
-
-
-    }*/
   }
   // async2 내장함수
   async function makemarker (pos_data:any,linepath:any,martid:number,mart_price_all_data:any) {
@@ -973,7 +773,7 @@ const KakaoMapComponent = ({center}) => {
     over_lay_cart_list.className = "bg-amber-400 rounded-lg shadow-lg w-[250px] h-[250px] p-2 absolute bottom-[60px] left-[-20px] z-30 overflow-auto hidden";
     over_lay_star.className = "flex justify-center items-center bg-slate-500 text-white rounded-b-lg w-full h-[40px] absolute bottom-0 left-0"; 
     over_lay_cart_list_btn.innerText = "자세히";
-    
+
     over_lay_cart_list_btn.addEventListener("click",async ()=> {
       if(over_lay_cart_list.style.display==="none") {
         over_lay_cart_list.style.display="block";
@@ -990,38 +790,30 @@ const KakaoMapComponent = ({center}) => {
             return res.json();
           })
           console.log("cartdata:",data.data);
-          if(data.success){
+          if(data.data.length!==0){
             for(const x of data.data){
                 let lists=document.createElement("li");
                 lists.textContent=x.productName+" "+x.finalPrice; 
-                lists.className="text-wrap";
                 over_lay_cart_list.appendChild(lists);
             }
            //over_lay_serve.textContent+=(mart_price_all_data[martid]+"원");
           }
           else{
             //over_lay_serve.textContent="없음";
-            let lists=document.createElement("li");
-            lists.className="text-wrap"
-            lists.textContent="오류가 발생했습니다. 다시시도해주세요"
-            over_lay_cart_list.appendChild(lists);
           }
         }
         else {
         }
-        over_lay_cart_list_btn.innerText="닫기";
       }
       else{
         over_lay_cart_list.style.display="none";
-                        
+        
         if(over_lay_cart_list.children.length>0){
-            let childs=Array.from(over_lay_cart_list.children);
-
-            for(const x of childs){
-                x.remove();
-            }
+          let childs=over_lay_cart_list.children;
+          for(const x of childs){
+            x.remove();
+          }
         }
-        over_lay_cart_list_btn.innerText="자세히";
       }
     })
 
@@ -1078,33 +870,6 @@ const KakaoMapComponent = ({center}) => {
     var placename=pos_data[1].place_name;  
 
     console.log("placename check:",placename);
-
-    let walk_length=document.createElement("li");
-    walk_length.textContent="거리:"+Math.round(polyline.getLength()).toString()+"m";
-
-    let place_name_li=document.createElement("li");
-    place_name_li.className="text-wrap"
-    place_name_li.textContent=placename;
-
-    let time=document.createElement("li");
-
-
-    let consume_time=Math.round(polyline.getLength()/1.3);
-    
-    time.textContent="소요 시간:"+timechange(consume_time);
-
-    let total_price=document.createElement("li");
-    console.log("check value:",mart_price_all_data.data[martid],martid)
-    let p=mart_price_all_data.data[martid]!==undefined ? mart_price_all_data.data[martid].toString()+"원":"0원";
-    total_price.textContent="합계:"+p
-
-
-    over_lay_main.appendChild(place_name_li);
-    over_lay_main.appendChild(total_price);
-    over_lay_main.appendChild(walk_length);
-    over_lay_main.appendChild(time);
-
-
     
     overlay_save_map.set(placename,customOverlay);
     place_finded.set(placename,polyline);
@@ -1133,7 +898,6 @@ const KakaoMapComponent = ({center}) => {
     // 클릭 이벤트 핸들러를 등록하고, 함수를 marker_function_save_map에 저장합니다.
     window.kakao.maps.event.addListener(marker, 'click', func);
     marker_function_save_map.set(marker, func);
-    set_over_lay_main_list(()=>[...over_lay_main_list,over_lay_main])
   }
 
   // panTo 함수(중심좌표로 이동하는 함수)
@@ -1144,50 +908,11 @@ const KakaoMapComponent = ({center}) => {
     // 만약 이동할 거리가 지도 화면보다 크면 부드러운 효과 없이 이동합니다
     map.panTo(moveLatLon); 
   }
-  function reset_maps(){
 
-    if(over_lay_save_maps!==null){
-      for(const key of over_lay_save_maps.keys()){
-        console.log("key test:",key);
-        place_findeds.get(key).setMap(null);
-        over_lay_save_maps.get(key).setMap(null);
-      }
-  }
-    if(marker_function_save_maps!==null){
-      for(const key of marker_function_save_maps.keys()){
-       window.kakao.maps.event.removeListener(key,'click',marker_function_save_maps.get(key));
-      }
-    }
-    if(marker_tracker_maps!==null){
-      for(const x of marker_tracker_maps.values()){
-       x.stop();//마커 트레이서기능을 종료시키는 과정.
-      }
-    }
-    if(marker_save_maps!==null){
-      for(const x of marker_save_maps.values()){
-        x[0].setMap(null);
-      }
-    }
-    if(center_marker!==null){
-      center_marker.setMap(null);
-    }
+  const area_mart_name = [];
 
-  }
-  function weather_modal_check(){
-    if(JSON.parse(window.localStorage.getItem("daycheck"))){
-      let daycheck=JSON.parse(window.localStorage.getItem("daycheck"));
-      let today=new Date().getTime();
-
-      today>daycheck ? set_weather_modal(()=>true) : set_weather_modal(()=>false); 
-
-    }
-  }
   // 카카오맵 load hook
   useEffect(()=>{
-    console.log("useeffect");
-    //set_over_lay_main_list(()=>[])
-    weather_modal_check()
-   
     if (kakaoMap && !map) {
       // 지도 설정 및 표시할 div 설정
       const container = document.getElementById('map'); 
@@ -1196,50 +921,27 @@ const KakaoMapComponent = ({center}) => {
         level: 3,
       };
       const newMap = new kakaoMap.Map(container, options);
-      setMap(()=>newMap);
-
-
-      
+      setMap(newMap);
     }
-    reset_maps();
-
     if(map) {
       const geocoder = new kakaoMap.services.Geocoder();
     }
     if(kakaoMap && map) {
       getLocation();
     }
-  }, [kakaoMap,map,center]);
+  }, [kakaoMap, map]);
 
   // 현 위치가 변경된 경우 중심좌표를 변경한 장소로 변경하는 로직 
-  /*useEffect(() => {
+  useEffect(() => {
     if (map && center) {
       const moveLatLon = new kakaoMap.LatLng(center.lat, center.lng);
       map.setCenter(moveLatLon);
     }
-  }, [center, map]);*/
+  }, [center, map]);
 
   // 표시하기 버튼 클릭시 async2 함수 실행(마커 오버레이 보여주기)
-  /*useEffect(() => {
+  useEffect(() => {
     const btn = document.getElementById("showmarker");
-      function activeasync2(){
-        async2();
-        console.log("button")
-      }
-    if(function_memmory===null){
-        console.log("event memeory")
-        set_function_memmorty(()=>activeasync2);
-           
-    }
-    else{
-            
-      btn.removeEventListener("click",function_memmory);
-      set_function_memmorty(()=>activeasync2);
-    }
-
-    btn.addEventListener("click",activeasync2)
-    const area_mart_name = [];
-
     if (btn) {
       btn.addEventListener("click", async2);
     }
@@ -1248,15 +950,11 @@ const KakaoMapComponent = ({center}) => {
         btn.removeEventListener("click", async2);
       }
     };
-  }, []);*/
+  }, []);
 
   // html
   return (
     <div className="relative w-full h-screen-50">
-
-    { weather_modal ? <WeatherModal weather={weather_special} weather_function={wether_modal_truth}/> :null }
-
-
 
       {/* 날씨 정보 탭 */}
       <div id="weather_bar" className=" flex justify-evenly w-full h-[50px] absolute top-0 bg-slate-100 z-40">
@@ -1272,7 +970,7 @@ const KakaoMapComponent = ({center}) => {
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" className="w-12 h-12"><path fill="#74C0FC" d="M192 512C86 512 0 426 0 320C0 228.8 130.2 57.7 166.6 11.7C172.6 4.2 181.5 0 191.1 0h1.8c9.6 0 18.5 4.2 24.5 11.7C253.8 57.7 384 228.8 384 320c0 106-86 192-192 192zM96 336c0-8.8-7.2-16-16-16s-16 7.2-16 16c0 61.9 50.1 112 112 112c8.8 0 16-7.2 16-16s-7.2-16-16-16c-44.2 0-80-35.8-80-80z"/></svg>
         </div>
       </div>
-      <button id="closeopenbtn" className="w-[50px] h-[50px] bg-red-100 absolute top-[50px] right-0 z-30"onClick={()=>{closeandopen()}}>close</button>
+      <button id="closeopenbtn" className="w-[50px] h-[50px] bg-red-100 absolute top-[50px] right-0 z-50"onClick={()=>{closeandopen()}}>close</button>
 
       {/* Kakao Map */}
       <div id="map" className="relative inset-0 w-full h-full"></div>
@@ -1280,7 +978,7 @@ const KakaoMapComponent = ({center}) => {
       {/* 중심좌표 이동 함수 */}
       <button
         onClick={panTo}
-        className="flex justify-center absolute w-[40px]h-[40px] bottom-6 left-4 p-2 bg-white rounded-lg shadow-md z-10"
+        className="flex justify-center absolute w-[40px] bottom-6 left-4 p-2 bg-white rounded-lg shadow-md z-10"
       >
         <img src="/utils/myLocation.png" width={15} height={40} />
       </button>
@@ -1288,17 +986,17 @@ const KakaoMapComponent = ({center}) => {
       {/* 마커 표시 하기 버튼 */}
       <button
         id="showmarker"
-        className="flex justify-center absolute w-[40px] h-[40px] bottom-6 left-20 p-2 bg-white rounded-lg shadow-md z-10 text-[10px]"
+        className="flex justify-center absolute w-[60px] bottom-6 left-20 p-2 bg-white rounded-lg shadow-md z-10"
       >
-          오버레이
+          표시하기
       </button>
 
       {/* 줌 on/off 버튼 */}
       <button 
         id="map_zoom" 
-        className="flex justify-center absolute w-[40px] h-[40px] bottom-6 left-[150px] p-2 bg-white rounded-lg shadow-md z-10"
+        className="flex justify-center absolute w-[60px] bottom-6 left-[150px] p-2 bg-white rounded-lg shadow-md z-10"
       >
-        +
+        줌 켜짐
       </button>
     </div>
   )
