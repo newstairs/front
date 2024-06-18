@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useMap } from './MapProvider'
 import '../../../styles/mapmarker.css'
 import { text } from 'stream/consumers';
-
+import WeatherModal from './weathermodal';
 // interface 정의
 interface documentarr {
   address_name:string,
@@ -65,6 +65,11 @@ const KakaoMapComponent = ({center}) => {
  
   const [function_memmory,set_function_memmorty]=useState(null);
 
+  const [weather_modal,set_weather_modal]=useState(true);
+
+  function wether_modal_truth(){
+    set_weather_modal(()=>false)
+  }
 
   const [center_marker,set_center_marker]=useState(null);
 
@@ -77,6 +82,9 @@ const KakaoMapComponent = ({center}) => {
   const [place_findeds,set_place_finded]=useState(null);
 
   const [marker_function_save_maps,set_marker_function_save_maps]=useState(null);
+
+  const [over_lay_main_list,set_over_lay_main_list]=useState<any[]>([]);
+  const [weather_special,set_weater_special]=useState(null);
 
   // 마커 트래킹에 필요한 변수들
   var place_finded=new Map();//polyline 데이터 저장.
@@ -140,9 +148,9 @@ const KakaoMapComponent = ({center}) => {
     icon.className = 'icon';
   let balloon = document.createElement('div');
     balloon.className = 'balloon';
-
-    tracker.appendChild(icon);
     tracker.appendChild(balloon);
+    tracker.appendChild(icon);
+    
     console.log("map:",map);
     map.getNode().appendChild(tracker);
 
@@ -465,11 +473,14 @@ const KakaoMapComponent = ({center}) => {
 
       if (weatherdata["특보데이터"]  === null) {
         console.log("특보데이터가 없습니다!");
+        set_weater_special(()=>null)
       }
       else {
         console.log(weatherdata["특보데이터"]);
         console.log(weather_local_data);
         console.log("현재" + weather_area_code[stnId] + "지역에" + weatherdata["특보데이터"] + "가 발생했습니다.")
+        let data={weathers:"현재 " + weather_area_code[stnId] + " 지역에 " + weatherdata["특보데이터"] + "가 발생했습니다."};
+        set_weater_special(()=>data)
       }
       for(const local_data of Object.keys(weather_local_data)) {
         switch (local_data){
@@ -906,6 +917,24 @@ const KakaoMapComponent = ({center}) => {
     set_place_finded(()=>place_finded);
     set_marker_function_save_maps(()=>marker_function_save_map);
     set_marker_tarcker(()=>marker_tracker_map);
+    /*for(const x of over_lay_main_list){
+
+      x.addEventListener("click",(event)=>{
+        console.log("z-index:",x===event.target)
+
+        over_lay_main_list.map(x=>{
+          if(x===event.target){
+            x.className="bg-white rounded-lg shadow-lg p-4 w-[200px] h-[250px] relative z-15"
+          }
+          else{
+            x.className="bg-white rounded-lg shadow-lg p-4 w-[200px] h-[250px] relative"
+          }
+        })
+      })
+      
+
+
+    }*/
   }
   // async2 내장함수
   async function makemarker (pos_data:any,linepath:any,martid:number,mart_price_all_data:any) {
@@ -944,7 +973,7 @@ const KakaoMapComponent = ({center}) => {
     over_lay_cart_list.className = "bg-amber-400 rounded-lg shadow-lg w-[250px] h-[250px] p-2 absolute bottom-[60px] left-[-20px] z-30 overflow-auto hidden";
     over_lay_star.className = "flex justify-center items-center bg-slate-500 text-white rounded-b-lg w-full h-[40px] absolute bottom-0 left-0"; 
     over_lay_cart_list_btn.innerText = "자세히";
-
+    
     over_lay_cart_list_btn.addEventListener("click",async ()=> {
       if(over_lay_cart_list.style.display==="none") {
         over_lay_cart_list.style.display="block";
@@ -965,6 +994,7 @@ const KakaoMapComponent = ({center}) => {
             for(const x of data.data){
                 let lists=document.createElement("li");
                 lists.textContent=x.productName+" "+x.finalPrice; 
+                lists.className="text-wrap";
                 over_lay_cart_list.appendChild(lists);
             }
            //over_lay_serve.textContent+=(mart_price_all_data[martid]+"원");
@@ -972,6 +1002,7 @@ const KakaoMapComponent = ({center}) => {
           else{
             //over_lay_serve.textContent="없음";
             let lists=document.createElement("li");
+            lists.className="text-wrap"
             lists.textContent="오류가 발생했습니다. 다시시도해주세요"
             over_lay_cart_list.appendChild(lists);
           }
@@ -1052,6 +1083,7 @@ const KakaoMapComponent = ({center}) => {
     walk_length.textContent="거리:"+Math.round(polyline.getLength()).toString()+"m";
 
     let place_name_li=document.createElement("li");
+    place_name_li.className="text-wrap"
     place_name_li.textContent=placename;
 
     let time=document.createElement("li");
@@ -1101,6 +1133,7 @@ const KakaoMapComponent = ({center}) => {
     // 클릭 이벤트 핸들러를 등록하고, 함수를 marker_function_save_map에 저장합니다.
     window.kakao.maps.event.addListener(marker, 'click', func);
     marker_function_save_map.set(marker, func);
+    set_over_lay_main_list(()=>[...over_lay_main_list,over_lay_main])
   }
 
   // panTo 함수(중심좌표로 이동하는 함수)
@@ -1140,10 +1173,21 @@ const KakaoMapComponent = ({center}) => {
     }
 
   }
+  function weather_modal_check(){
+    if(JSON.parse(window.localStorage.getItem("daycheck"))){
+      let daycheck=JSON.parse(window.localStorage.getItem("daycheck"));
+      let today=new Date().getTime();
 
+      today>daycheck ? set_weather_modal(()=>true) : set_weather_modal(()=>false); 
+
+    }
+  }
   // 카카오맵 load hook
   useEffect(()=>{
     console.log("useeffect");
+    //set_over_lay_main_list(()=>[])
+    weather_modal_check()
+   
     if (kakaoMap && !map) {
       // 지도 설정 및 표시할 div 설정
       const container = document.getElementById('map'); 
@@ -1210,6 +1254,10 @@ const KakaoMapComponent = ({center}) => {
   return (
     <div className="relative w-full h-screen-50">
 
+    { weather_modal ? <WeatherModal weather={weather_special} weather_function={wether_modal_truth}/> :null }
+
+
+
       {/* 날씨 정보 탭 */}
       <div id="weather_bar" className=" flex justify-evenly w-full h-[50px] absolute top-0 bg-slate-100 z-40">
         <div id="T1H" className='flex justify-center items-center'>
@@ -1232,7 +1280,7 @@ const KakaoMapComponent = ({center}) => {
       {/* 중심좌표 이동 함수 */}
       <button
         onClick={panTo}
-        className="flex justify-center absolute w-[40px] bottom-6 left-4 p-2 bg-white rounded-lg shadow-md z-10"
+        className="flex justify-center absolute w-[40px]h-[40px] bottom-6 left-4 p-2 bg-white rounded-lg shadow-md z-10"
       >
         <img src="/utils/myLocation.png" width={15} height={40} />
       </button>
@@ -1240,15 +1288,15 @@ const KakaoMapComponent = ({center}) => {
       {/* 마커 표시 하기 버튼 */}
       <button
         id="showmarker"
-        className="flex justify-center absolute w-[60px] bottom-6 left-20 p-2 bg-white rounded-lg shadow-md z-10"
+        className="flex justify-center absolute w-[40px] h-[40px] bottom-6 left-20 p-2 bg-white rounded-lg shadow-md z-10 text-[10px]"
       >
-          표시하기
+          오버레이
       </button>
 
       {/* 줌 on/off 버튼 */}
       <button 
         id="map_zoom" 
-        className="flex justify-center absolute w-[60px] bottom-6 left-[150px] p-2 bg-white rounded-lg shadow-md z-10"
+        className="flex justify-center absolute w-[40px] h-[40px] bottom-6 left-[150px] p-2 bg-white rounded-lg shadow-md z-10"
       >
         +
       </button>
