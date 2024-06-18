@@ -15,14 +15,16 @@ interface friend_data {
   name: string
 }
 
-interface friend_data_list {
-  friend_datas: friend_data[]
+interface Props {
+  frienddata: friend_data[],
+  item_list: CartItem[]
 }
+
 
 const CartList: React.FC = () => {
   const [isListOpen, setIsListOpen] = useState(true); // 리스트 열림/닫힘 상태 관리
   const [hasitems, sethasitems] = useState(false);
-  const [friendlist, setfriendlist] = useState<friend_data_list>();
+  const [friendlist, setfriendlist] = useState<friend_data[]>();
   const cart_list = JSON.parse(localStorage.getItem("Item_Chosen")) || [];
   const hasItems = cart_list.length > 0;
   const [location, setLocation] = useState<{ datas: string[] }>(null);
@@ -107,20 +109,20 @@ const CartList: React.FC = () => {
   }
 
   const getfrienddata = async () => {
-    if (friend_onoff === false) {
+    if (!friend_onoff) {
       let datas = await fetch("http://localhost:3000/returnfriendlist", {
         method: 'GET',
         headers: {
           Authorization: "Bearer " + localStorage.getItem("access_token")
         }
       }).then((res) => { return res.json(); })
-      friend_data = datas.data.elements.map((x) => {
+      let friend_data = datas.data.elements.map((x) => {
         return {
           uuid: x.uuid,
           name: x.profile_nickname
         }
       })
-      setfriendlist({ friend_datas: friend_data })
+      setfriendlist( friend_data )
       setfriend(true)
       const data = await fetch("http://localhost:3000/cart", {
         method: "GET",
@@ -134,7 +136,7 @@ const CartList: React.FC = () => {
     }
   }
 
- const [items, setItem] = useState<CartItem[]>([]);
+  const [items, setItem] = useState<CartItem[]>([]);
 
   // useEffect(() => {
   //   const fetchdata = async () => {
@@ -149,7 +151,7 @@ const CartList: React.FC = () => {
   //   }
   //   fetchdata()
   // }, [])
-   useEffect(() => {
+  useEffect(() => {
   const fetchdata = async () => {
   const response = await fetch("http://localhost:3000/cart", {
     method: "GET",
@@ -190,7 +192,7 @@ fetchdata()
         {hasitems ? (
           <ul className="flex flex-col items-center divide-y divide-gray-200 space-y-4">
             {(items || []).map(item => (
-              <li id={item.productId} key={item.productId} className="item_list w-full flex items-center p-2 bg-white rounded-lg shadow-md">
+              <li id={item.productId.toString()} key={item.productId} className="item_list w-full flex items-center p-2 bg-white rounded-lg shadow-md">
                 <input type="checkbox" className="mr-2" />
                 <img src={item.productImgUrl} alt={item.productName} className="h-10 w-10 object-cover mr-2" />
                 <span className="flex-grow">{item.productName}</span>

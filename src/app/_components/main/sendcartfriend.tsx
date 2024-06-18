@@ -29,17 +29,18 @@ const SendCartlist: React.FC<MapProps>=({cartlist,carttruth})=>{
     const [testlist,settestlist]=useState<Test[]>([{name:"황동근"},{name:"박종우"},{name:"이호종"},{name:"황동근"},{name:"황동근"},{name:"황동근"},{name:"황동근"}]);
     console.log("sendcartlist:",carttruth);
     console.log("carlistdata:",cartlist);
+
     const click=()=>{
         
         carttruth.datas=false;
         console.log("carttruth.datas:",carttruth.datas);
         const list=document.querySelectorAll(".li");
         Array.from(list).map((el,idx)=>{
-        if(el.childNodes[0].checked){
-            console.log(el.childNodes[1].textContent);
-        }
-    })
-
+            const checkbox = el.childNodes[0] as HTMLInputElement;
+            if (checkbox.checked) {
+                console.log(el.childNodes[1].textContent);
+            }
+        })
     }
 
     return (
@@ -55,17 +56,12 @@ const SendCartlist: React.FC<MapProps>=({cartlist,carttruth})=>{
             <ul className=" divide-y divide-gray-200 ">
                 {testlist.map((item,idx)=>(
                     <li key={idx} className="li flex grow  p-2 bg-white rounded-lg my-5 mx-auto w-4/5 ">
-                                      <input className="member_check" type="checkbox"></input>
-             
-              <span className="text-black">{item.name}</span>
-                </li>
+                        <input className="member_check" type="checkbox"></input>
+                        <span className="text-black">{item.name}</span>
+                    </li>
                 ))}
-
             </ul>
-            
-         
         </div>
-
     </div>
 
     );
