@@ -12,6 +12,7 @@ interface friend_data{
 interface Friendlist{
     frienddata:friend_data_list
     item_list:items
+    handle_friend_set:()=>void
 }
 interface items{
     items:item[]
@@ -23,7 +24,7 @@ interface item{
     quantity:number
 }
 
-const FriendList: React.FC<Friendlist> = ({frienddata,item_list}) => {
+const FriendList: React.FC<Friendlist> = ({frienddata,item_list,handle_friend_set}) => {
     console.log("item_list:",item_list);
     const send_cartlist_to_friend=async ()=>{
        let x=document.querySelectorAll(".friend_list");
@@ -57,22 +58,27 @@ const FriendList: React.FC<Friendlist> = ({frienddata,item_list}) => {
     const find_memeber=()=>{
 
         let doc=document.getElementById("member_find");
-        
-        const find_list=x.filter((mem)=>{
-            if(mem.name===doc.value){
-                return true;
-            }
-            return false;
-        })
-        
         let doc2=document.getElementById("show_box");
-        let doc2_child=Array.from(doc2.children)
-        for(let x of doc2_child){
-            x.remove();
+        if(doc.value===""){
+            doc2.className="absolute hidden w-[200px]  bg-red-400 overflow-scroll overflow-x-hidden"
+
         }
+        else{
+            const find_list=x.filter((mem)=>{
+                if(mem.name.includes(doc.value)){
+                    return true;
+                }
+                return false;
+            })
         
-        if(find_list.length>0){  
-            doc2.className="absolute w-[200px]  bg-red-400 overflow-scroll overflow-x-hidden"
+            
+            let doc2_child=Array.from(doc2.children)
+            for(let x of doc2_child){
+                x.remove();
+            }
+        
+            if(find_list.length>0){  
+            doc2.className="absolute w-[200px]  bg-red-400 overflow-scroll overflow-x-hidden z-20"
             console.log("findlist:",find_list);
             for(let x of find_list){
                 let doc3=document.createElement("div");
@@ -86,9 +92,10 @@ const FriendList: React.FC<Friendlist> = ({frienddata,item_list}) => {
                 
             }
             
-        }
-        else{
-            doc2.className="absolute hidden w-[200px]  bg-red-400 overflow-scroll overflow-x-hidden"
+            }
+            else{
+                doc2.className="absolute hidden w-[200px]  bg-red-400 overflow-scroll overflow-x-hidden"
+            }
         }
     }
 
@@ -97,8 +104,10 @@ const FriendList: React.FC<Friendlist> = ({frienddata,item_list}) => {
     <div className="absolute w-[200px] h-[200px]   bg-slate-500 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-100 overflow-scroll overflow-x-hidden "> 
         
         
-        <input id="member_find" placeholder="검색칸" type="text" onChange={()=>{find_memeber()}}></input>
+        <input id="member_find"className="rounded-lg w-full border-[1px] my-[2px] border-black" placeholder="검색칸" type="text" onChange={()=>{find_memeber()}}></input>
         <div id="show_box" className="absolute hidden w-[200px]  bg-red-400 overflow-scroll overflow-x-hidden"></div>
+        <button className="bg-white w-1/2 sticky top-[0px] right-0 rounded-lg"onClick={()=>{handle_friend_set()}}>닫기</button>
+        <button className="w-1/2 bg-red-500 sticky top-[0px] left-0 rounded-lg"onClick={()=>{send_cartlist_to_friend()}}>제출하기</button>
         {
             <ul className="">
                 {
@@ -114,7 +123,7 @@ const FriendList: React.FC<Friendlist> = ({frienddata,item_list}) => {
             </ul>
         }
 
-        <button onClick={()=>{send_cartlist_to_friend()}}>제출하기</button>
+        
 
     </div>)
 

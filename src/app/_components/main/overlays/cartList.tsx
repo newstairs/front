@@ -114,7 +114,7 @@ const CartList: React.FC = () => {
           Authorization: "Bearer " + localStorage.getItem("access_token")
         }
       }).then((res) => { return res.json(); })
-      friend_data = datas.data.elements.map((x) => {
+      let friend_data = datas.data.elements.map((x) => {
         return {
           uuid: x.uuid,
           name: x.profile_nickname
@@ -132,6 +132,12 @@ const CartList: React.FC = () => {
     } else {
       setfriend(false);
     }
+  }
+
+
+  function handlefriendset(){
+    setfriend(false)
+    console.log("setfriend");
   }
 
   const [items, setItem] = useState()
@@ -164,7 +170,10 @@ const CartList: React.FC = () => {
           친구에게 보내기
         </button>
 
-        {friend_onoff && <FriendList frienddata={friendlist} item_list={items} />}
+
+        {friend_onoff && <FriendList frienddata={friendlist} item_list={items} handle_friend_set={handlefriendset} />}
+
+       
 
         {hasitems ? (
           <ul className="flex flex-col items-center divide-y divide-gray-200 space-y-4">
