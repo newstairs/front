@@ -399,7 +399,7 @@ const KakaoMapComponent = ({center}) => {
       let rs = convertposition(origin_cord[0], origin_cord[1]);
       let nx = rs.x;
       let ny = rs.y;
-
+      console.log("nx,nxy:",nx,ny,datearr);
       let url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?serviceKey=${serviceKey}&pageNo=1&numOfRows=10&base_date=${datearr[0]}&base_time=${datearr[1]}&dataType=JSON&nx=${nx}&ny=${ny}`
 
       let option = {
@@ -409,6 +409,7 @@ const KakaoMapComponent = ({center}) => {
         .then((result)=>{
           return result.json();
         })
+      console.log("weather_local_data:",data);
       for (const x of data.response.body.items.item) {
         switch (x.category) {
           case "T1H":
