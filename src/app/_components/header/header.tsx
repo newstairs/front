@@ -19,7 +19,7 @@ const Header: React.FC<HeaderProps> = ({ onSetCenter, onItemSelected }) => {
   }
 
   return (
-    <header className="fixed top-0 h-14 w-full shadow-md z-50">
+    <header className="fixed top-0 h-14 w-full shadow-md z-50 bg-sky-300">
       <div className="flex justify-between items-center">
 
         {/* 로그아웃 버튼 및 현 위치 설정 tooltab */}
@@ -29,7 +29,7 @@ const Header: React.FC<HeaderProps> = ({ onSetCenter, onItemSelected }) => {
           <ul className="flex space-x-4 p-4">
             {items.map((item, index) => (
               <li key={index} onClick={() => handleClick(index, item)}
-                  className={`cursor-pointer ${index === activeIndex ? 'text-blue-500' : 'text-white-700'}`}>
+                  className={`cursor-pointer ${index === activeIndex ? 'text-#2F4F4F' : 'text-white'}`}>
                 {item}
               </li>
             ))}
