@@ -4,6 +4,7 @@ import { useMap } from './MapProvider'
 import '../../../styles/mapmarker.css'
 import { text } from 'stream/consumers';
 import WeatherModal from './weathermodal';
+
 // interface 정의
 interface documentarr {
   address_name:string,
