@@ -31,6 +31,8 @@ const ReviewDetails: React.FC<Detail> = ({id}) => {
   const [content,set_content]=useState<string>();
   const router = useRouter();
 
+  const BACKEND_URI = process.env.NEXT_PUBLIC_BACKEND_URI
+
   const handledetailpage=(x:boolean)=>{
       set_show_page(x);
   }
@@ -55,7 +57,7 @@ const ReviewDetails: React.FC<Detail> = ({id}) => {
 
     useEffect(()=>{
       async function res(id){
-        const data=await fetch(`http://localhost:3000/reviews/${id}?page=${current_page-1}`,{
+        const data=await fetch(`${BACKEND_URI}/reviews/${id}?page=${current_page-1}`,{
           method:"GET",
           headers:{
             "Content-Type":"application/json",
