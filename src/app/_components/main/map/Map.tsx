@@ -88,6 +88,8 @@ const KakaoMapComponent = ({center}) => {
 
   const [weather_special,set_weater_special]=useState(null);
 
+  const BACKEND_URI = process.env.NEXT_PUBLIC_BACKEND_URI;
+
   // 마커 트래킹에 필요한 변수들
   var place_finded=new Map();//polyline 데이터 저장.
   var marker_save_map:Map<string,any>=new Map();//marker랑 place 데이터 저장
@@ -379,7 +381,7 @@ const KakaoMapComponent = ({center}) => {
       for(const x of place_data.documents){
         doc_list.push({martName:x.place_name,martAddress:x.road_address_name})
       };
-      let answer = await fetch("http://localhost:3000/marts", {
+      let answer = await fetch(`${BACKEND_URI}/marts`, {
         method: "post",
         headers: {
           "Content-Type": "application/json",
@@ -838,7 +840,7 @@ const KakaoMapComponent = ({center}) => {
     datafromback=JSON.parse(localStorage.getItem("mart_around"));
     console.log("datafromback:",datafromback);
 
-    let mart_price_all_data = await fetch("http://localhost:3000/marts/selling", {
+    let mart_price_all_data = await fetch(`${BACKEND_URI}/marts/selling`, {
       method: "GET",
       headers: {
         Authorization:"Bearer "+localStorage.getItem("access_token")
@@ -975,7 +977,7 @@ const KakaoMapComponent = ({center}) => {
         if(over_lay_cart_list.children.length===0) {
           console.log("line=0");
 
-          const data=await fetch(`http://localhost:3000/marts/selling/${martid}`, {
+          const data=await fetch(`${BACKEND_URI}/marts/selling/${martid}`, {
             method:'GET',
             headers:{
                 Authorization:"Bearer "+localStorage.getItem("access_token")

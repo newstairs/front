@@ -23,6 +23,8 @@ const MainList: React.FC = () => {
   const [totalPages] = useState(9); // 총 페이지 수
   const [isListOpen, setIsListOpen] = useState(true); // 리스트 열림/닫힘 상태 관리
 
+  const BACKEND_URI = process.env.NEXT_PUBLIC_BACKEND_URI;
+
   //로컬 스토리지에 사용자가 택한 아이템들을 추가하는 과정.
   /*const AddToLocalStorage=(itemid:number,itemimgurl:string,itemname:string)=>{
       if(JSON.parse(localStorage.getItem("Item_Chosen"))===null){
@@ -62,7 +64,7 @@ const MainList: React.FC = () => {
   //fetch문으로 가져와서 백엔드에다가 데이터를 넣는과정.
   const add_to_cartlist=async(itemid:number,itemimgurl:string,itemname:string)=>{
 
-      const data=await fetch("http://localhost:3000/cart",{
+      const data=await fetch(`${BACKEND_URI}/cart`,{
         method:"POST",
         headers:{
           Authorization:"Bearer "+localStorage.getItem("access_token"),
@@ -83,7 +85,7 @@ const MainList: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/products?page=${currentPage-1}&size=12`,{
+        const response = await fetch(`${BACKEND_URI}/products?page=${currentPage-1}&size=12`,{
           headers: {
             'Content-Type': 'application/json'
           }
