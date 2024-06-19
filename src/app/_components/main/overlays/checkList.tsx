@@ -40,7 +40,7 @@ const CheckList: React.FC = () => {
             <li key={item.id} className="w-full flex items-center p-2">
               <div className="flex flex-row items-center justify-between w-full">
                 <img src={item.image} alt={item.name} className="h-10 w-10 object-cover" />
-                <div className="text-center text-white mb-2 mx-4">{item.name}</div>
+                <div className="text-center text-black mb-2 mx-4">{item.name}</div>
               </div>
             </li>
           ))}

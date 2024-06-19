@@ -1285,15 +1285,19 @@ const KakaoMapComponent = ({center}) => {
       {/* 마커 표시 하기 버튼 */}
       <button
         id="showmarker"
+
         className="flex justify-center absolute w-[40px] h-[40px] bottom-6 left-20 p-2 bg-white rounded-lg shadow-md z-10 text-[10px]"
       >
           오버레이
+
       </button>
 
       {/* 줌 on/off 버튼 */}
       <button 
         id="map_zoom" 
+
         className="flex justify-center absolute w-[40px] h-[40px] bottom-6 left-[150px] p-2 bg-white rounded-lg shadow-md z-10"
+
       >
         +
       </button>

@@ -59,8 +59,6 @@ const MainList: React.FC = () => {
       }    
   }*/
 
-
-  
   //fetch문으로 가져와서 백엔드에다가 데이터를 넣는과정.
   const add_to_cartlist=async(itemid:number,itemimgurl:string,itemname:string)=>{
 
@@ -80,10 +78,7 @@ const MainList: React.FC = () => {
         console.log("error:",data.message);
       }
       console.log("success add cartlist:",data);
-      //fetch문으로 나의 카트리스트에다가 데이터를 채우는 과정.
   }
-  
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -92,7 +87,7 @@ const MainList: React.FC = () => {
           headers: {
             'Content-Type': 'application/json'
           }
-        });  // 백엔드 URL
+        });
         const data = await response.json();
         console.log(data);
         setAllItems(data.data);  
@@ -101,11 +96,11 @@ const MainList: React.FC = () => {
       }
     };
 
-    fetchData();  // fetchData 함수 실행
+    fetchData();
   }, [currentPage]);
 
-    const handlePageChange = (page: number) => {
-    setCurrentPage(page); // 페이지 변경 처리
+  const handlePageChange = (page: number) => {
+      setCurrentPage(page);
   };
 return (
   <div className="list-container">
@@ -132,7 +127,7 @@ return (
             <div className="flex flex-row items-center justify-between w-full">
               <img src={item.productImgUrl} alt={item.productName} className="h-10 w-10 object-cover mb-2" />
               <div className="truncate text-center text-black mx-4">{item.productName}</div>
-              <button onClick={()=>{add_to_cartlist(item.productId,item.productImgUrl,item.productName)}}type="button" className="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-500 dark:focus:ring-blue-800">
+              <button onClick={()=>{add_to_cartlist(item.productId,item.productImgUrl,item.productName)}} type="button" className="text-sky-700 hover:text-white border border-sky-300 hover:bg-sky-400 focus:ring-4 focus:outline-none focus:ring-sky-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-sky-500 dark:text-sky-500 dark:hover:text-white dark:hover:bg-sky-500 dark:focus:ring-sky-800">
                 추가
               </button>
             </div>
