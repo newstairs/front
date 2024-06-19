@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-
+import "../../../styles/scroll.css";
 
 interface friend_data{
     uuid:string,
@@ -26,7 +26,7 @@ interface CartItem{
 
 
 const FriendList: React.FC<Friendlist> = ({frienddata,item_list,handle_friend_set}) => {
-
+    console.log("frienddata:",frienddata);
     console.log("item_list:",item_list);
     const send_cartlist_to_friend=async ()=>{
         let x=document.querySelectorAll(".friend_list");
@@ -86,11 +86,11 @@ const FriendList: React.FC<Friendlist> = ({frienddata,item_list,handle_friend_se
 
         let doc2=document.getElementById("show_box");
         if(doc.value===""){
-            doc2.className="absolute hidden w-full  bg-red-400 overflow-scroll overflow-x-hidden"
+            doc2.className="absolute hidden w-1/2 right-0 bg-red-400 "
 
         }
         else{
-            const find_list=x.filter((mem)=>{
+            const find_list=frienddata.filter((mem)=>{
                 if(mem.name.includes(doc.value)){
                     return true;
                 }
@@ -104,7 +104,7 @@ const FriendList: React.FC<Friendlist> = ({frienddata,item_list,handle_friend_se
             }
         
             if(find_list.length>0){  
-            doc2.className="absolute w-full bg-red-400 overflow-scroll overflow-x-hidden z-20"
+            doc2.className="absolute w-1/2 bg-white right-0 z-20"
             console.log("findlist:",find_list);
             for(let x of find_list){
                 let doc3=document.createElement("div");
@@ -120,56 +120,75 @@ const FriendList: React.FC<Friendlist> = ({frienddata,item_list,handle_friend_se
             
             }
             else{
-                doc2.className="absolute hidden w-[200px]  bg-red-400 overflow-scroll overflow-x-hidden"
+                doc2.className="absolute hidden w-1/2 right-0  bg-white "
             }
         }
     }
     const mart_list=JSON.parse(window.localStorage.getItem("mart_around"));
 
 
+    const mouseup=(event)=>{
+     
+      let doc=document.getElementById("show_name");
+      doc.className="fixed top-0 left-0  rounded-lg bg-slate-200"
+      doc.textContent=event.target.textContent;
+    
+    }
+    const mousedown=(event)=>{
+        let doc=document.getElementById("show_name");
+        doc.className=" hidden fixed top-0 left-0 bg-white"
+   
+        
+        
+    }
+
  return  (
-    <div className="absolute w-[300px] h-[300px]   bg-slate-500 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-100 overflow-scroll overflow-x-hidden "> 
+    <div className="absolute w-[400px] h-[250px]   bg-blue-300 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-100 "> 
 
         
-        
-        <input id="member_find"className="rounded-lg w-full border-[1px] my-[2px] border-black" placeholder="검색칸" type="text" onChange={()=>{find_memeber()}}></input>
-        <div id="show_box" className="absolute hidden w-full  bg-red-400 overflow-scroll overflow-x-hidden"></div>
-        <button className="bg-white w-1/2 sticky top-[0px] right-0 rounded-lg"onClick={()=>{handle_friend_set()}}>닫기</button>
-        <button className="w-1/2 bg-red-500 sticky top-[0px] left-0 rounded-lg"onClick={()=>{send_cartlist_to_friend()}}>제출하기</button>
-        <div className="flex justify-normal h-[300px]">
-        <div id="show_mart_list" className="w-1/2 h-full bg-green-100">
+        <button className="bg-white w-1/4 sticky top-0 right-0 rounded-lg"onClick={()=>{handle_friend_set()}}>닫기</button>
+        <button className="w-1/4 bg-white sticky top-0 left-0 rounded-lg"onClick={()=>{send_cartlist_to_friend()}}>전송하기</button>
+        <input id="member_find"className="rounded-lg w-1/2 border-[1px] my-[2px] border-black" placeholder="친구 이름을 입력해주세요" type="text" onChange={()=>{find_memeber()}}></input>
+        <div id="show_box" className="absolute right-0 hidden w-1/2  bg-white "></div>
+
+        <div className="flex justify-normal h-[245px]">
+        <div id="show_name" className="fixed bottom-[-24px] left-0 hidden"></div>
+        <div id="show_mart_list" className="w-1/2 h-auto bg-blue-200 scrollbar overflow-scroll overflow-x-hidden">
+            
             <form>
+            
             {
-                <ul>
+                <ul id="show_mart_ul">
                     {
                         mart_list.map((x)=>(
 
-                            <li  key={x.id} className="mart_list bg-white rounded-lg w-full h-[20px]">
-                            <input id={x.martId} className="checkbox" type="radio" value={x.martAddress} name="mart"></input>{x.martName}
-                                </li>
+                            <li  key={x.id} className="mart_list  overflow-hidden whitespace-nowrap text-ellipsis  border-b-[2px] border-slate-400  w-full h-[20px] my-[5px]" onMouseOver={(event)=>{mouseup(event)}} onMouseOut={(event)=>{mousedown(event)}}>
+                                <input id={x.martId} className="checkbox" type="radio" value={x.martAddress} name="mart" ></input>{x.martName}
+                                
 
 
-                        ))
-                    }
+                            </li>
  
-
+                            ))
+                    }
 
                 </ul>
             }
 
 
             </form>
+           
         </div>
         
         
-        <div id="show_friend_list" className="w-1/2 bg-blue-300 h-full">
+        <div id="show_friend_list" className="w-1/2 bg-blue-200  h-auto scrollbar overflow-scroll overflow-x-hidden">
         {
             <ul>
                 {
                     frienddata.map(x=>(
 
 
-                        <li id={x.uuid} key={x.uuid} className="friend_list bg-white rounded-lg w-full h-[20px]">
+                        <li id={x.uuid} key={x.uuid} className="friend_list my-[5px]  border-b-[2px] border-slate-400  w-full h-[20px]">
                             <input className="checkbox" type="checkbox"></input>{x.name}
                         </li>
 
@@ -181,7 +200,7 @@ const FriendList: React.FC<Friendlist> = ({frienddata,item_list,handle_friend_se
         </div>
 
         
-
+       
     </div>)
 
 
