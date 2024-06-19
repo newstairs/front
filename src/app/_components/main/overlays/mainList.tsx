@@ -63,23 +63,29 @@ const MainList: React.FC = () => {
 
   //fetch문으로 가져와서 백엔드에다가 데이터를 넣는과정.
   const add_to_cartlist=async(itemid:number,itemimgurl:string,itemname:string)=>{
-
-      const data=await fetch(`${BACKEND_URI}/cart`,{
+    try{
+      const response=await fetch(`${BACKEND_URI}/cart`,{
         method:"POST",
         headers:{
           Authorization:"Bearer "+localStorage.getItem("access_token"),
           'Content-Type': 'application/json'
         },
-        body:JSON.stringify({
+        body: JSON.stringify({
           productId:itemid
         })
-        })
-      .then((res)=>{return res.json();})
+      })
+      const res = await response.json();
 
-      if(data.success){
-        console.log("error:",data.message);
+      if(!res.success){
+        console.log("error:",res.message);
       }
-      console.log("success add cartlist:",data);
+      else {
+        console.log("success add cartlist:", res);
+      }
+    }
+    catch (error) {
+      console.error('Error adding to cart:', error);
+    }
   }
 
   useEffect(() => {
@@ -92,9 +98,15 @@ const MainList: React.FC = () => {
         });
         const data = await response.json();
         console.log("cartitem:",data);
-        setAllItems(data.data);  
+        if(data && data.data){
+          setAllItems(data.data);  
+        }
+        else {
+          setAllItems([]);
+        }
       } catch (error) {
         console.error('Fetching data failed', error);
+        setAllItems([]);
       }
     };
 
