@@ -31,24 +31,46 @@ const FriendList: React.FC<Friendlist> = ({frienddata,item_list,handle_friend_se
     const send_cartlist_to_friend=async ()=>{
         let x=document.querySelectorAll(".friend_list");
         let sendlist=Array.from(x).filter((item)=>{
-        const checkbox = item.children[0] as HTMLInputElement;
-        if(checkbox.checked){
-            console.log(item.id);
-            return true;
+            const checkbox = item.children[0] as HTMLInputElement;
+            if(checkbox.checked){
+                console.log(item.id);
+                return true;
+            }
+            return false;
+        })
+        let martlist=document.querySelectorAll(".mart_list")//Array.from(document.querySelectorAll(".mart_list"));
+        let mart_Address;
+        let mart_id;
+        let martname;
+        for(const x of martlist){
+           
+            if(x.children[0].checked){
+                mart_Address=x.children[0].value;
+                mart_id=x.children[0].id
+                martname=x.textContent;
+                console.log("mart_id:",mart_id);
+              
+            }
         }
-        return false;
-    })
 
+        console.log("mart_address:",mart_Address);
+    
+    
+    
 
-    let uuid_list=sendlist.map((x)=>{return x.id});
-    console.log("uud_list:",uuid_list);
-    let s=await fetch("http://localhost:3000/sendmsgtofriend",
-        {method:'POST',
-            headers:{
-                'Content-Type':"application/json",
-                Authorization:"Bearer "+localStorage.getItem("access_token")},
-            body:JSON.stringify({friend_uuid:uuid_list,
-                                item_list:item_list
+        let uuid_list=sendlist.map((x)=>{return x.id});
+        console.log("uud_list:",uuid_list);
+        let s=await fetch("http://localhost:3000/sendmsgtofriend",
+            {method:'POST',
+                headers:{
+                    'Content-Type':"application/json",
+                    Authorization:"Bearer "+localStorage.getItem("access_token")},
+                body:JSON.stringify({
+                                mart_id:mart_id,
+                                mart_address:mart_Address,
+                                friend_uuid:uuid_list,
+                                item_list:item_list,
+                                martname:martname
             })})
             .then((res)=>{return res.json();})
 
@@ -116,26 +138,27 @@ const FriendList: React.FC<Friendlist> = ({frienddata,item_list,handle_friend_se
         <button className="w-1/2 bg-red-500 sticky top-[0px] left-0 rounded-lg"onClick={()=>{send_cartlist_to_friend()}}>제출하기</button>
         <div className="flex justify-normal h-[300px]">
         <div id="show_mart_list" className="w-1/2 h-full bg-green-100">
+            <form>
             {
                 <ul>
                     {
                         mart_list.map((x)=>(
 
-                            <li id={x.martAddress} key={x.id} className="friend_list bg-white rounded-lg w-full h-[20px]">
-                            <input className="checkbox" type="checkbox"></input>{x.martName}
+                            <li  key={x.id} className="mart_list bg-white rounded-lg w-full h-[20px]">
+                            <input id={x.martId} className="checkbox" type="radio" value={x.martAddress} name="mart"></input>{x.martName}
                                 </li>
 
 
                         ))
                     }
-
+ 
 
 
                 </ul>
             }
 
 
-
+            </form>
         </div>
         
         

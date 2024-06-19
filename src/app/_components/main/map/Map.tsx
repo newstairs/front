@@ -83,7 +83,9 @@ const KakaoMapComponent = ({center}) => {
 
   const [marker_function_save_maps,set_marker_function_save_maps]=useState(null);
 
-  const [over_lay_main_list,set_over_lay_main_list]=useState<any[]>([]);
+  //const [over_lay_main_list,set_over_lay_main_list]=useState<any[]>([]);
+
+
   const [weather_special,set_weater_special]=useState(null);
 
   // 마커 트래킹에 필요한 변수들
@@ -93,20 +95,7 @@ const KakaoMapComponent = ({center}) => {
   var marker_tracker_map=new Map();//마커트래커 저장.
   var marker_function_save_map:Map<any,any>=new Map();//마커에 등록된 이벤트 지울떄 쓰는 함수.
 
-
-  function clearall(){
-    let d=document.getElementsByClassName("tracker");
-
-    console.log("document:",d);
-    if(d.length!==0){
-        
-         
-    for(const x of Array.from(d)){
-        
-        x.remove();
-    }}
-    
-  }
+  var customOverlay_main_list_map=new Map();
 
 
 
@@ -794,6 +783,7 @@ const KakaoMapComponent = ({center}) => {
     marker_tracker_map.clear();
     overlay_save_map.clear();
     place_finded.clear();
+    customOverlay_main_list_map.clear();
     marker_function_save_map.clear();
     console.log("마커 함수 저장 제거후 :",marker_function_save_map.keys());
     console.log("오버레이 키값 제거후:",overlay_save_map.keys());
@@ -856,7 +846,7 @@ const KakaoMapComponent = ({center}) => {
     .then ((res) => {
       return res.json();
     })
-
+   //over_lay_main_list=[];
     for(const position of datafromback) {
       console.log("position:",position["martName"]);
       var pos_data=marker_save_map.get(position["martName"]);
@@ -905,36 +895,40 @@ const KakaoMapComponent = ({center}) => {
         //mart_price_all_data=mart_price_all_data.data;
         console.log("mart_price_all_data:",mart_price_all_data);
         console.log("position:",position);
-        makemarker(pos_data,linepath,position["martId"],mart_price_all_data)
+        await makemarker(pos_data,linepath,position["martId"],mart_price_all_data)
+        console.log("hello")
       }
       catch(error) {
         console.error('Error:', error);
       }
     }
 
-
+    console.log("why")
     set_overlay_save_maps(()=>overlay_save_map);
     set_place_finded(()=>place_finded);
     set_marker_function_save_maps(()=>marker_function_save_map);
     set_marker_tarcker(()=>marker_tracker_map);
-    /*for(const x of over_lay_main_list){
-
+    for(const x of customOverlay_main_list_map.keys()){
+      let ars= Array.from(customOverlay_main_list_map.keys());
       x.addEventListener("click",(event)=>{
-        console.log("z-index:",x===event.target)
-
-        over_lay_main_list.map(x=>{
-          if(x===event.target){
-            x.className="bg-white rounded-lg shadow-lg p-4 w-[200px] h-[250px] relative z-15"
+        
+        ars.map((item)=>{
+        
+          if(item===x){
+            customOverlay_main_list_map.get(item).setZIndex(10);
+            console.log( customOverlay_main_list_map.get(item).getZIndex())
           }
           else{
-            x.className="bg-white rounded-lg shadow-lg p-4 w-[200px] h-[250px] relative"
+            customOverlay_main_list_map.get(item).setZIndex(3);
+            console.log( customOverlay_main_list_map.get(item).getZIndex())
           }
         })
-      })
+
       
 
 
-    }*/
+      })
+    }
   }
   // async2 내장함수
   async function makemarker (pos_data:any,linepath:any,martid:number,mart_price_all_data:any) {
@@ -1094,6 +1088,7 @@ const KakaoMapComponent = ({center}) => {
     time.textContent="소요 시간:"+timechange(consume_time);
 
     let total_price=document.createElement("li");
+   
     console.log("check value:",mart_price_all_data.data[martid],martid)
     let p=mart_price_all_data.data[martid]!==undefined ? mart_price_all_data.data[martid].toString()+"원":"0원";
     total_price.textContent="합계:"+p
@@ -1133,7 +1128,9 @@ const KakaoMapComponent = ({center}) => {
     // 클릭 이벤트 핸들러를 등록하고, 함수를 marker_function_save_map에 저장합니다.
     window.kakao.maps.event.addListener(marker, 'click', func);
     marker_function_save_map.set(marker, func);
-    set_over_lay_main_list(()=>[...over_lay_main_list,over_lay_main])
+    //console.log("over_lay_main_list:",[...over_lay_main_list,over_lay_main])
+    //set_over_lay_main_list(()=>[...over_lay_main_list,over_lay_main])
+    customOverlay_main_list_map.set(over_lay_main,customOverlay);
   }
 
   // panTo 함수(중심좌표로 이동하는 함수)
