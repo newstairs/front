@@ -29,6 +29,8 @@ const ReviewDetails: React.FC<Detail> = ({id}) => {
   const [show_page,set_show_page]=useState(false);
 
   const [content,set_content]=useState<string>();
+  const router = useRouter();
+
   const handledetailpage=(x:boolean)=>{
       set_show_page(x);
   }
@@ -75,6 +77,7 @@ const ReviewDetails: React.FC<Detail> = ({id}) => {
       }
       res(id);
     },[current_page])
+
   const show_review_page=(contents:string)=>{
       set_show_page(true);
 
@@ -84,8 +87,18 @@ const ReviewDetails: React.FC<Detail> = ({id}) => {
     set_show_page(x);
       }
 
+  const handleLinkPostPage = () => {
+    router.push(`/reviews?id=${id}`);
+  }
+
   return (
   <div className="w-full max-w-4xl mx-auto bg-white shadow-lg p-6 rounded-lg">
+    <button 
+      className="mt-5 bg-transparent hover:bg-sky-200 font-semibold hover:text-white py-2 px-4 border border-bg-sky-300 hover:border-transparent rounded"
+      onClick={handleLinkPostPage}
+    >
+      등록하기
+    </button>
     {
       // 페이징된 리뷰 데이터를 받아와 나열하는 과정
       show ? reviews.map(x => (

@@ -1,19 +1,22 @@
 'use client'
 import React, { useState, ChangeEvent } from 'react'
 import MakeStar from './StarMarker'
+import { useSearchParams } from 'next/navigation';
 
 const PostReview = () => {
   const [starRating, setStarRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
+  const [title, setTitle] = useState('');
   const [image, setImage] = useState(null);
-  
-  const martId = 1 // 임의의 마트 id이다.
+  const searchParams = useSearchParams();
+  const martId = searchParams.get('id');
 
   const Link = `/reviews/detail/${martId}`
 
   // api 통신 로직은 수정예정이다.(마트 이름과 마트 정보를 가져와야하는 추가 보수 사항이 존재)
   const handleReviewSubmit = async () => {
     const formData = new FormData();
+    formData.append('title', title);
     formData.append('reviewContent', reviewText);
     formData.append('score', starRating.toString());
     formData.append('martId', martId.toString());
@@ -26,7 +29,7 @@ const PostReview = () => {
     }
     else {
       try {
-        const response = await fetch('/reviews/:id', {
+        const response = await fetch('/reviews', {
           method: 'POST',
           body: formData
         });
@@ -51,11 +54,21 @@ const PostReview = () => {
 
 
   return (
-    <div className='flex-col justify-center items-center'>
-      <div className='ml-[25%] w-[50%] h-screen'>
-        <p className='pt-10'>리뷰 할 마트명</p>
+    <div className='flex-col bg-gray-200 justify-center items-center'>
+      <div className='pt-[5%] ml-[25%] w-[50%] h-screen'>
         {/* 별점 입력 기능 */}
         <MakeStar setStarRating={setStarRating}/>
+
+        <label> 제목 </label>
+        <textarea
+          id="title"
+          className="block mb-5 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 resize-none" 
+          minLength={1}
+          placeholder="제목을 입력해주세요."
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        >
+        </textarea>
 
         {/* 상세 리뷰 작성 칸 */}
         <label htmlFor="message" className="block mb-2 font-medium text-gray-900">상세 리뷰를 작성해주세요</label>
@@ -94,7 +107,7 @@ const PostReview = () => {
         {/* 작성 완료 버튼 */}
         <div className='flex justify-center'>
           <button 
-            className="mt-5 bg-transparent hover:bg-gray-500  font-semibold hover:text-white py-2 px-4 border border-black hover:border-transparent rounded"
+            className="mt-5 bg-transparent hover:bg-sky-200 font-semibold hover:text-white py-2 px-4 border border-bg-sky-300 hover:border-transparent rounded"
             onClick={handleReviewSubmit}
           >
             등록하기
