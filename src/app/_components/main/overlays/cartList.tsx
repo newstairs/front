@@ -357,7 +357,16 @@ const CartList: React.FC = () => {
     }
   }
 
-  const [items, setItem] = useState<CartItem[]>([]);
+
+
+
+  function handlefriendset(){
+    setfriend(false)
+    console.log("setfriend");
+  }
+
+  const [items, setItem] = useState()
+
 
   useEffect(() => {
   const fetchdata = async () => {
@@ -402,7 +411,10 @@ fetchdata()
         </div>
       
 
-        {friend_onoff && <FriendList frienddata={friendlist} item_list={items} />}
+
+        {friend_onoff && <FriendList frienddata={friendlist} item_list={items} handle_friend_set={handlefriendset} />}
+
+       
 
         {hasitems ? (
           <ul className="flex flex-col items-center divide-y divide-gray-200 space-y-4">
@@ -442,9 +454,12 @@ fetchdata()
           <p className="flex justify-center text-gray-500">장바구니에 품목을 담아주세요</p>
         )}
 
+
       </div>
     </div>
   );
 };
 
+
 export default CartList;
+

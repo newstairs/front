@@ -6,20 +6,19 @@ interface weather{
 
 interface MapProps{
     weather:weather
+    weather_function:()=>void;
 }
 
-const WeatherModal: React.FC<MapProps> =({weather})=>{
-
+const WeatherModal: React.FC<MapProps> =({weather,weather_function})=>{
+    
     const changelocal=()=>{
-        const data:any=window.localStorage.getItem("daycheck");
-        let local_data=JSON.parse(data)
-        console.log("before:",local_data)
-        if(!local_data.truth){
-        local_data.truth=true;
-        console.log("change");
-        }
-        console.log("after:",local_data)
-        window.localStorage.setItem("daycheck",JSON.stringify(local_data));
+
+        let today=new Date().getTime();
+        window.localStorage.setItem("daycheck",JSON.stringify(today+86400000));
+        
+
+        weather_function();
+        
     }
 
     const deletemodal=()=>{
@@ -29,14 +28,25 @@ const WeatherModal: React.FC<MapProps> =({weather})=>{
     }
     console.log("weather:",weather)
 
-    return (<div id="modal" className="w-[500px] h-[500px] bg-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2   rounded-lg shadow-md z-20">
-        <button onClick={()=>deletemodal()}>x</button>
-        <input type="checkbox" onClick={()=>changelocal()} className="w-[50px] h-[50px] bg-black"></input>
-        
-        {weather.weathers}
+    return (<div id="modal" className="w-[250px] h-[250px] absolute bg-blue-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2   rounded-lg shadow-md z-20">
+       
+        <div className="flex absolute bottom-0 items-center ">
+        <input type="checkbox"  onClick={()=>changelocal()} className="w-[20px] h-[20px] bg-black"></input>
+        <div className="text-center  inline">하루동안 안보기</div>
+        </div>
+        <div className=" w-full h-[100px] absolute  top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center align-middle">
+        {weather !== null ? (
+            <>
+            {weather.weathers}<br />
+            상세 날씨를 꼭 확인해주세요!
+            </>
+            ) : "평소와 다름없는 날씨내요 좋은 하루되세요!"}
+         
+        </div>
     </div>);
 
 
 }
 
 export default WeatherModal;
+
