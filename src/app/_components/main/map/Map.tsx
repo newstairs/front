@@ -303,7 +303,7 @@ const KakaoMapComponent = ({center}) => {
       navigator.geolocation.getCurrentPosition(function showPosition(position:geolocationposition) {
 
         // let locPosition = new kakaoMap.LatLng(latitude, longitude);
-        console.log("center:",center.lat.toString().substring(0),center.lng.toString().substring(0));        
+        // console.log("center:",center.lat.toString().substring(0),center.lng.toString().substring(0));        
         if(center.lat!==null && center.lng!==null){
             console.log(center.lat.toString().substring(0).length);
             origin_cord=[center.lat.toString().substring(0),center.lng.toString().substring(0)]
@@ -695,9 +695,9 @@ const KakaoMapComponent = ({center}) => {
     
     //rs['lat'] = parseInt(v1,10);
     //rs['lng'] = parseInt(v2,10);
-    var ra = Math.tan(Math.PI * 0.25 + (parseInt(v1,10) * DEGRAD * 0.5));
+    var ra = Math.tan(Math.PI * 0.25 + (parseFloat(v1) * DEGRAD * 0.5));
     ra = re * sf / Math.pow(ra, sn);
-    var theta = parseInt(v2,10) * DEGRAD - olon;
+    var theta = parseFloat(v2) * DEGRAD - olon;
     if (theta > Math.PI) theta -= 2.0 * Math.PI;
     if (theta < -Math.PI) theta += 2.0 * Math.PI;
     theta *= sn;
@@ -705,8 +705,8 @@ const KakaoMapComponent = ({center}) => {
     //rs['y'] = Math.floor(ro - ra * Math.cos(theta) + YO + 0.5);
 
     const rs: GridCoordinates = {
-        lat: parseInt(v1, 10),
-        lng: parseInt(v2, 10),
+        lat: parseFloat(v1),
+        lng: parseFloat(v2),
         x: Math.floor(ra * Math.sin(theta) + XO + 0.5),
         y: Math.floor(ro - ra * Math.cos(theta) + YO + 0.5)
     };
