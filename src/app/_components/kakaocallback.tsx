@@ -11,8 +11,16 @@ const KakaoCallback: React.FC = () => {
     history.replaceState(null, '', dummyUrl);
 }
   useEffect(() => {
-    
-    console.log("code:",code.get("code").substring(1))
+    if (code) {
+      const codeValue = code.get("code");
+      if(codeValue) {
+        console.log("code:", codeValue.substring(1))
+      } else {
+        console.log("code 값이 정의되지 않았습니다.");
+      }
+    } else {
+      console.log("code 객체가 정의되지 않았습니다.");
+    }
     window.onload = changeUrlToDummy;
 
 
