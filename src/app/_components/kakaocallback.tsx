@@ -4,46 +4,47 @@ import React ,{ useEffect } from 'react';
 
 const KakaoCallback: React.FC = () => {
   const code = useSearchParams();
-  const BACKEND_URL = 'http://localhost:3000/reqlogin';
+  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URI;
   const router = useRouter();
+
   function changeUrlToDummy() {
     const dummyUrl = "/dummy-url";
     history.replaceState(null, '', dummyUrl);
-}
-  useEffect(() => {
-    if (code) {
-      const codeValue = code.get("code");
-      if(codeValue) {
-        console.log("code:", codeValue.substring(1))
-      } else {
-        console.log("code 값이 정의되지 않았습니다.");
-      }
-    } else {
-      console.log("code 객체가 정의되지 않았습니다.");
-    }
-    window.onload = changeUrlToDummy;
+  }
 
+  useEffect(() => {
+    const codeValue = code.get('code');
+    if(codeValue) {
+      console.log("code:", codeValue.substring(1));
+    } else {
+      console.log("code 값이 정의되지 않았습니다.");
+    }
+    
+    changeUrlToDummy();
 
     const kakaoLogin = async () => {
-
-        const response = await fetch(`http://localhost:3000/reqlogin`, {
+      try{
+        const response = await fetch(`${BACKEND_URL}/reqlogin`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ access_code: code.get("code") })
+          body: JSON.stringify({ access_code: codeValue })
         })
-        .then((res)=>{return res.json();})
+        const res = await response.json();
         
-        localStorage.setItem('access_token',response.data);
-        console.log("성공:",response);
+        localStorage.setItem('access_token',res.data);
+        console.log("성공:",res);
         
         // 로그인 성공 시 리디렉션
         setTimeout(() => {
           router.push('/main');
         }, 100);
-      
-    };
+      } catch (error) {
+        console.error("로그인 실패:", error);
+        router.push("/login");
+      }
+    } 
 
     if (code && BACKEND_URL) {
       kakaoLogin();
