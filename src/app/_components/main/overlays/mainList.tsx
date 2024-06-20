@@ -91,7 +91,7 @@ const MainList: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${BACKEND_URI}/products?page=${currentPage-1}&size=12`,{
+        const response = await fetch(`${BACKEND_URI}/products?page=${currentPage-1}&size=12`, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: "Bearer "+localStorage.getItem("access_token")

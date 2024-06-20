@@ -59,7 +59,7 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({ onSetCenter }) => {
   };
 
   return (
-    <div className="dropdown relative w-[100px] ml-4 p-2 bg-white">
+    <div className="dropdown relative w-[100px] ml-4 p-2 bg-sky-300">
       <button className='flex justify-center items-center dropdownBtn w-full' onClick={toggleDropdown}>
         <img className='w-5' src='./utils/menu.png' alt='ToolTab' />
       </button>
@@ -72,7 +72,7 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({ onSetCenter }) => {
 
       {isModalOpen && (
         <div className='modal fixed inset-0 flex items-center justify-center bg-black bg-opacity-50'>
-          <div className='modalContent w-[300px] bg-white p-5 rounded'>
+          <div className='modalContent w-[300px] bg-sky-200 p-5 rounded'>
             {/* 상단 nav 바 */}
             <div className='flex justify-between'>
               <h2>내 위치 설정</h2>
