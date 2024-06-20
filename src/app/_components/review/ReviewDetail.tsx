@@ -44,7 +44,8 @@ const ReviewDetails: React.FC<Detail> = ({id}) => {
      //api에서 변수를 받아서 string꼴의 별점을 반환하는 함수.
     function makestar(score:number){
       const a=document.createElement("a");
-      score=Math.floor(score/2);
+      // score=Math.floor(score/2);
+      score=Math.floor(score);
       let star="";
       for(let i=0;i<5;i++){
           score>i ? star+="★" :star+="☆"
