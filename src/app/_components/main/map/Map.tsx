@@ -592,7 +592,7 @@ const KakaoMapComponent = ({center}) => {
       function displayCenterMarker(lat:number,lng:number){
 
         console.log("latlng:",lat,lng);
-        var imageSrc = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Me_bank_logo15.png/225px-Me_bank_logo15.png" // 마커이미지의 주소입니다    
+        var imageSrc = "./utils/nowlocation.png" // 마커이미지의 주소입니다    
         let imageSize = new kakaoMap.Size(64, 69) // 마커이미지의 크기입니다
         let imageOption = {offset: new kakaoMap.Point(27, 69)}; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다
         
@@ -968,7 +968,7 @@ const KakaoMapComponent = ({center}) => {
 
     over_lay_main.className = "bg-white rounded-lg shadow-lg p-4 w-[200px] h-[250px] relative";
     //over_lay_serve.className = "bg-red-100 rounded-t-lg w-full h-[150px] mb-2";
-    over_lay_cart_list_btn.className = "bg-blue-500 text-white rounded-full w-[40px] h-[40px] absolute right-2 bottom-2";
+    over_lay_cart_list_btn.className = "bg-blue-500 text-base text-white rounded-full w-[36px] h-[36px] absolute right-2 bottom-2";
     over_lay_cart_list.className = "bg-amber-400 rounded-lg shadow-lg w-[250px] h-[250px] p-2 absolute bottom-[60px] left-[-20px] z-30 overflow-auto hidden";
     over_lay_star.className = "flex justify-center items-center bg-slate-500 text-white rounded-b-lg w-full h-[40px] absolute bottom-0 left-0"; 
     over_lay_cart_list_btn.innerText = "자세히";
@@ -1093,7 +1093,7 @@ const KakaoMapComponent = ({center}) => {
     time.textContent="소요 시간:"+timechange(consume_time);
 
     let total_price=document.createElement("li");
-   
+  
     console.log("check value:",mart_price_all_data.data[martid],martid)
     let p=mart_price_all_data.data[martid]!==undefined ? mart_price_all_data.data[martid].toString()+"원":"0원";
     total_price.textContent="합계:"+p
@@ -1189,7 +1189,7 @@ const KakaoMapComponent = ({center}) => {
     console.log("useeffect");
     //set_over_lay_main_list(()=>[])
     weather_modal_check()
-   
+  
     if (kakaoMap && !map) {
       // 지도 설정 및 표시할 div 설정
       const container = document.getElementById('map'); 
