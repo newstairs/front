@@ -1,6 +1,6 @@
 'use client';
 import React ,{ useEffect } from 'react';
-;import { useSearchParams,useRouter } from 'next/navigation'
+;import { useSearchParams, useRouter } from 'next/navigation'
 
 const KakaoCallback: React.FC = () => {
   const searchParams = useSearchParams();
@@ -25,6 +25,9 @@ const KakaoCallback: React.FC = () => {
 
     const kakaoLogin = async () => {
       try{
+        console.log("BACKEND_URL:", BACKEND_URL);
+        console.log("Sending access_code:", code);
+
         const response = await fetch(`${BACKEND_URL}/reqlogin`, {
           method: 'POST',
           headers: {
@@ -32,15 +35,21 @@ const KakaoCallback: React.FC = () => {
           },
           body: JSON.stringify({ access_code: code })
         })
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const res = await response.json();
         
         localStorage.setItem('access_token',res.data);
+
         console.log("성공:",res);
         
         // 로그인 성공 시 리디렉션
         setTimeout(() => {
           router.push('/main');
         }, 100);
+
       } catch (error) {
         console.error("로그인 실패:", error);
         router.push("/login");
@@ -50,6 +59,7 @@ const KakaoCallback: React.FC = () => {
     if (code && BACKEND_URL) {
       kakaoLogin();
     }
+
   } ,[searchParams, BACKEND_URL, router]);
 
   return (
