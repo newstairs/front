@@ -78,7 +78,7 @@ const ReviewDetails: React.FC<Detail> = ({id}) => {
         }
       }
       res(id);
-    },[current_page])
+    },[BACKEND_URI, id, current_page])
 
   const show_review_page=(contents:string)=>{
       set_show_page(true);
