@@ -8,7 +8,7 @@ const Review: React.FC = () => {
   const search=useSearchParams();
 
   const url=window.location.href;
-  const id=url.substring(37, url.length);
+  const id=url.substring(47, url.length);
   
   console.log(id);
 
