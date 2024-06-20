@@ -32,6 +32,7 @@ const PostReview = () => {
     // if (image) {
     //   formData.append('image', image);
     // }
+    
     if(starRating === 0) {
       alert('별점을 선택해주세요');
       return;
