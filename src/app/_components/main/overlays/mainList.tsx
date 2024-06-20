@@ -93,7 +93,8 @@ const MainList: React.FC = () => {
       try {
         const response = await fetch(`${BACKEND_URI}/products?page=${currentPage-1}&size=12`,{
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            Authorization: "Bearer "+localStorage.getItem("access_token")
           }
         });
         const data = await response.json();

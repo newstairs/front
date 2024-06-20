@@ -35,10 +35,11 @@ const KakaoCallback: React.FC = () => {
           },
           body: JSON.stringify({ access_code: code })
         })
+        
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const res = await response.json();
         
         localStorage.setItem('access_token',res.data);
