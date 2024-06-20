@@ -1033,9 +1033,9 @@ const KakaoMapComponent = ({center}) => {
       a.textContent=star;
       a.style.color="red";
       a.target="_blank";
-      let m="http://localhost:3000/reviews/deatil/35"
+      let m="https://ssagemeogja.netlify.app/reviews/deatil/35";
       console.log("test:","http://localhost:3000/detail/35".substring(30,m.length))
-      a.href=`http://localhost:3000/reviews/detail/${martid}`;
+      a.href=`https://ssagemeogja.netlify.app/reviews/detail/${martid}`;
       over_lay_star.appendChild(a);
     }
     makestar(4.5);
