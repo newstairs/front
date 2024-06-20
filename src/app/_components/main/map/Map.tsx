@@ -477,8 +477,8 @@ const KakaoMapComponent = ({center}) => {
         let data={weathers:"현재 " + weather_area_code[stnId] + " 지역에 " + weatherdata["특보데이터"] + "가 발생했습니다."};
         set_weater_special(()=>data)}
         else{
-          
-        }
+          set_weater_special(()=>null)
+        } 
       }
       for(const local_data of Object.keys(weather_local_data)) {
         switch (local_data){
