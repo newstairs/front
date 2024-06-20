@@ -446,7 +446,7 @@ const KakaoMapComponent = ({center}) => {
       try {
         let strs = data.response.body.items.item[0].title;
         let arr = strs.split(" ");
-        weatherdata["특보데이터"] = null;
+        weatherdata["특보데이터"] = "";
         for (const x of arr) {
           if (x.includes("주의보")) {
             weatherdata["특보데이터"] += x;
@@ -470,11 +470,15 @@ const KakaoMapComponent = ({center}) => {
         set_weater_special(()=>null)
       }
       else {
+        if(weatherdata["특보데이터"]!==""){
         console.log(weatherdata["특보데이터"]);
         console.log(weather_local_data);
         console.log("현재" + weather_area_code[stnId] + "지역에" + weatherdata["특보데이터"] + "가 발생했습니다.")
         let data={weathers:"현재 " + weather_area_code[stnId] + " 지역에 " + weatherdata["특보데이터"] + "가 발생했습니다."};
-        set_weater_special(()=>data)
+        set_weater_special(()=>data)}
+        else{
+          set_weater_special(()=>null)
+        } 
       }
       for(const local_data of Object.keys(weather_local_data)) {
         switch (local_data){
