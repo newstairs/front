@@ -12,7 +12,7 @@ const PostReview = () => {
   const martId = searchParams.get('id');
 
   const BACKEND_URI = process.env.NEXT_PUBLIC_BACKEND_URI
-  
+
   const Link = `/reviews/detail/${martId}`
 
   // api 통신 로직은 수정예정이다.(마트 이름과 마트 정보를 가져와야하는 추가 보수 사항이 존재)
@@ -33,6 +33,9 @@ const PostReview = () => {
       try {
         const response = await fetch(`${BACKEND_URI}/reviews`, {
           method: 'POST',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`
+          },
           body: formData
         });
   
