@@ -32,7 +32,7 @@ const PostReview = () => {
     }
     else {
       try {
-        const response = await fetch(`${BACKEND_URI}/reviews`, {
+        const response = await fetch(`${BACKEND_URI}/reviews/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
