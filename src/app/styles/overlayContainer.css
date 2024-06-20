@@ -8,11 +8,6 @@
   padding: 10px;
 }
 
-.toggle-icon {
-  top: 56px;
-  width: fit-content;
-  z-index: 1;
-}
 .list-container {
   display: flex;
   background: transparent;
