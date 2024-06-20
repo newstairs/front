@@ -21,8 +21,8 @@ const nextConfig = {
       },
       {
         source: "/:path*",
-        // destination: "http://ec2-15-164-104-176.ap-northeast-2.compute.amazonaws.com:8080/:path*",
-        destination: "https://eyn7z0xlo9.execute-api.ap-northeast-2.amazonaws.com/ssagemeogja/sgmj",
+        destination: "http://ec2-15-164-104-176.ap-northeast-2.compute.amazonaws.com:8080/:path*",
+        // destination: "https://eyn7z0xlo9.execute-api.ap-northeast-2.amazonaws.com/ssagemeogja/sgmj",
       }
     ];
   },
