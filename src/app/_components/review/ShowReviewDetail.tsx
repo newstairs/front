@@ -33,7 +33,8 @@
 import React, { useEffect, useState } from 'react';
 
 interface Detail {
-    content: string;
+  title: string;
+  content: string;
   setting_show: (x: boolean) => void;
 }
 
