@@ -23,6 +23,11 @@ const PostReview = () => {
     // formData.append('score', starRating.toString());
     // formData.append('martId', martId.toString());
 
+    console.log("title:", title);
+    console.log("reviewText:", reviewText);
+    console.log("starRating:",starRating);
+    console.log("martId", martId);
+
     // if (image) {
     //   formData.append('image', image);
     // }
