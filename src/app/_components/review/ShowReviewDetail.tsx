@@ -38,7 +38,7 @@ interface Detail {
   setting_show: (x: boolean) => void;
 }
 
-const ReviewDetails: React.FC<Detail> = ({ content, setting_show }) => {
+const ReviewDetails: React.FC<Detail> = ({ title, content, setting_show }) => {
   const close = () => {
     setting_show(false);
     console.log("close");
@@ -48,7 +48,9 @@ const ReviewDetails: React.FC<Detail> = ({ content, setting_show }) => {
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center p-4">
       <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full">
         <div className="flex-col p-5">
-          <h2 className="text-lg font-semibold text-gray-900 mb-3 border-b border-gray-300 pb-2">상세 내용</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-3 border-b border-gray-300 pb-2">
+            {title}
+          </h2>
           <div className="text-gray-800 text-sm">
             {content}
           </div>
