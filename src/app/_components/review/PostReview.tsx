@@ -22,7 +22,7 @@ const PostReview = () => {
     // formData.append('reviewContent', reviewText);
     // formData.append('score', starRating.toString());
     // formData.append('martId', martId.toString());
-    
+
     // if (image) {
     //   formData.append('image', image);
     // }
@@ -35,6 +35,7 @@ const PostReview = () => {
         const response = await fetch(`${BACKEND_URI}/reviews`, {
           method: 'POST',
           headers: {
+            'Content-Type': 'application/json',
             Authorization: `Bearer ${localStorage.getItem('access_token')}`
           },
           // body: formData
@@ -47,8 +48,8 @@ const PostReview = () => {
         });
   
         if (response.ok) {
-          window.location.href = Link;
           console.log('리뷰 작성 완료');
+          window.location.href = Link;
         } else {
           console.error('리뷰 작성 실패');
         }
