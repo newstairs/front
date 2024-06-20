@@ -8,7 +8,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onSetCenter, onItemSelected }) => {
-  const [center, setCenter] = useState({ lat: 37.566826, lng: 126.9786567 });
+  const [center, setCenter] = useState({ lat: null, lng: null });
   const [activeIndex, setActiveIndex] = useState<number>(0); 
   const items: string[] = ["메인 품목 리스트", "마트 별 선택 항목", "장바구니"];
 

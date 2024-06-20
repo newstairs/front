@@ -248,12 +248,16 @@ const CartList: React.FC = () => {
   const [friendlist, setfriendlist] = useState<friend_data[]>();
   const cart_list = JSON.parse(localStorage.getItem("Item_Chosen")) || [];
   const hasItems = cart_list.length > 0;
-  const [location, setLocation] = useState<{ datas: string[] }>(null);
+  const [items, setItem] = useState<CartItem[]>([]);
+
+  const [location, setLocation] = useState<{ datas: string[] | null }>(null);
   const [friend_onoff, setfriend] = useState(false);
 
+  const BACKEND_URI = process.env.NEXT_PUBLIC_BACKEND_URI
+
   const handleQuantityChange2 = async (id: number, delta: number) => {
-    const plus = `http://localhost:3000/cart/plus/${id}`;
-    const minus = `http://localhost:3000/cart/minus/${id}`;
+    const plus = `${BACKEND_URI}/cart/plus/${id}`;
+    const minus = `${BACKEND_URI}/cart/minus/${id}`;
 
     if (delta > 0) {
       calculation(plus, id, delta)
@@ -293,7 +297,7 @@ const CartList: React.FC = () => {
   }
 
   const delete_item_by_one = async (itemid: number) => {
-    const data = await fetch(`http://localhost:3000/cart/${itemid}`, {
+    const data = await fetch(`${BACKEND_URI}/cart/${itemid}`, {
       method: "DELETE",
       headers: {
         Authorization: "Bearer " + localStorage.getItem("access_token")
@@ -310,7 +314,7 @@ const CartList: React.FC = () => {
   }
 
   const delete_item_all = async () => {
-    const data = await fetch("http://localhost:3000/cart", {
+    const data = await fetch(`${BACKEND_URI}/cart`, {
       method: "DELETE",
       headers: {
         Authorization: "Bearer " + localStorage.getItem("access_token")
@@ -331,7 +335,7 @@ const CartList: React.FC = () => {
 
   const getfrienddata = async () => {
     if (!friend_onoff) {
-      let datas = await fetch("http://localhost:3000/returnfriendlist", {
+      let datas = await fetch(`${BACKEND_URI}/returnfriendlist`, {
         method: 'GET',
         headers: {
           Authorization: "Bearer " + localStorage.getItem("access_token")
@@ -345,7 +349,7 @@ const CartList: React.FC = () => {
       })
       setfriendlist( friend_data )
       setfriend(true)
-      const data = await fetch("http://localhost:3000/cart", {
+      const data = await fetch(`${BACKEND_URI}/cart`, {
         method: "GET",
         headers: {
           Authorization: "Bearer " + localStorage.getItem("access_token")
@@ -357,11 +361,18 @@ const CartList: React.FC = () => {
     }
   }
 
-  const [items, setItem] = useState<CartItem[]>([]);
+
+
+
+  function handlefriendset(){
+    setfriend(false)
+    console.log("setfriend");
+  }
+
 
   useEffect(() => {
   const fetchdata = async () => {
-  const response = await fetch("http://localhost:3000/cart", {
+  const response = await fetch(`${BACKEND_URI}/cart`, {
     method: "GET",
     headers: {
       Authorization: "Bearer " + localStorage.getItem("access_token")
@@ -402,7 +413,10 @@ fetchdata()
         </div>
       
 
-        {friend_onoff && <FriendList frienddata={friendlist} item_list={items} />}
+
+        {friend_onoff && <FriendList frienddata={friendlist} item_list={items} handle_friend_set={handlefriendset} />}
+
+       
 
         {hasitems ? (
           <ul className="flex flex-col items-center divide-y divide-gray-200 space-y-4">
@@ -442,9 +456,12 @@ fetchdata()
           <p className="flex justify-center text-gray-500">장바구니에 품목을 담아주세요</p>
         )}
 
+
       </div>
     </div>
   );
 };
 
+
 export default CartList;
+

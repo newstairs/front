@@ -15,6 +15,7 @@ const CheckList: React.FC = () => {
     { id: 5, image: '/path/to/image.jpg', name: '포도 주스'},
     { id: 6, image: '/path/to/image.jpg', name: '우유' }
   ])
+  
 
   return (
     <div className="list-container bg-transparent">

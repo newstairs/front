@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom scrollbar styles */
+.scrollbar::-webkit-scrollbar {
+    width: 3px;
+    height:6px;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-700 rounded-full;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+    @apply bg-gray-300;
+}

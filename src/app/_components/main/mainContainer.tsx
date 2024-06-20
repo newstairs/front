@@ -16,7 +16,7 @@ const MainContainer: React.FC = () => {
   //const [location, setLocation] = useState<{ lat: number; lng: number }>({ lat: 33.450701, lng: 126.570667 });
   //const [location, setLocation] =  useState<{ datas:string[] }>({datas:["KB국민은행 상계역지점","IBK기업은행365 중계주공3단지아파트","코리아세븐 세븐-중계2호 ATM"]})
   const [dayCheck,setDayCheck]=useState(false);
-  const [center, setCenter] = useState({ lat: 37.566826, lng: 126.9786567 });
+  const [center, setCenter] = useState({ lat: null, lng: null });
 
   const day_mem=()=>{
     const now=new Date();
