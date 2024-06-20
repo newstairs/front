@@ -3,7 +3,7 @@ import React ,{ useEffect } from 'react';
 ;import { useSearchParams,useRouter } from 'next/navigation'
 
 const KakaoCallback: React.FC = () => {
-  const code = useSearchParams();
+  const searchParams = useSearchParams();
   const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URI;
   const router = useRouter();
 
@@ -13,10 +13,10 @@ const KakaoCallback: React.FC = () => {
   }
 
   useEffect(() => {
-    const codeValue = code.get('code');
+    const code = searchParams.get('code');
 
-    if (codeValue) {
-      console.log("code:", codeValue.substring(1));
+    if (code) {
+      console.log("code:", code.substring(1));
     } else {
       console.log("code 값이 정의되지 않았습니다.");
     }
@@ -30,7 +30,7 @@ const KakaoCallback: React.FC = () => {
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ access_code: codeValue })
+          body: JSON.stringify({ access_code: code })
         })
         const res = await response.json();
         
@@ -50,7 +50,7 @@ const KakaoCallback: React.FC = () => {
     if (code && BACKEND_URL) {
       kakaoLogin();
     }
-  } ,[code, BACKEND_URL,router]);
+  } ,[searchParams, BACKEND_URL, router]);
 
   return (
     // <div className="bg-white w-full h-full">
@@ -74,7 +74,5 @@ const KakaoCallback: React.FC = () => {
   </div>
   );
 };
-
-
 
 export default KakaoCallback;
