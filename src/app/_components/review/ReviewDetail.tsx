@@ -6,6 +6,7 @@ import ShowReviewDetail from "../../_components/review/ShowReviewDetail"
 
 interface review{
   reviewId:number,
+  reviewTitle:string,
   reviewContent:string,
   score:number,
   memberName:string,
@@ -29,6 +30,8 @@ const ReviewDetails: React.FC<Detail> = ({id}) => {
   const [show_page,set_show_page]=useState(false);
 
   const [content,set_content]=useState<string>();
+  const [title, setTitle]=useState<string>();
+  
   const router = useRouter();
 
   const BACKEND_URI = process.env.NEXT_PUBLIC_BACKEND_URI
@@ -72,7 +75,8 @@ const ReviewDetails: React.FC<Detail> = ({id}) => {
         
         if(data.success){
           setshow(true);
-          setReviews(data.data.content)
+          setTitle(data.data.title);
+          setReviews(data.data.content);
         }
         else{
           setshow(false);
@@ -81,10 +85,11 @@ const ReviewDetails: React.FC<Detail> = ({id}) => {
       res(id);
     },[BACKEND_URI, id, current_page])
 
-  const show_review_page=(contents:string)=>{
+  const show_review_page=(contents:string, title:string)=>{
       set_show_page(true);
 
       set_content(contents);
+      setTitle(title);
     }
   const handle_page_show=(x:boolean)=>{
     set_show_page(x);
@@ -107,9 +112,9 @@ const ReviewDetails: React.FC<Detail> = ({id}) => {
       show ? reviews.map(x => (
         <li key={x.reviewId} 
             className="flex justify-between items-center p-4 hover:bg-gray-100 rounded-md cursor-pointer transition-colors"
-            onClick={() => { show_review_page(x.reviewContent) }}>
-          <span className="text-gray-800 text-sm">
-            {x.reviewContent}
+            onClick={() => { show_review_page(x.reviewContent, x.reviewTitle) }}>
+          <span className="mb-2 text-gray-800 text-base">
+            {x.reviewTitle}
           </span>
           <span className="text-yellow-500 text-lg">
             {makestar(x.score)}
@@ -124,7 +129,7 @@ const ReviewDetails: React.FC<Detail> = ({id}) => {
     {
       // 클릭 시 해당 리뷰 내용을 보여주는 모달창
       show_page && 
-      <ShowReviewDetail content={content} setting_show={handle_page_show}/>
+      <ShowReviewDetail title={title} content={content} setting_show={handle_page_show}/>
     }
 
     {
