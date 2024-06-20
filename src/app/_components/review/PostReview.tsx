@@ -5,8 +5,8 @@ import { useSearchParams } from 'next/navigation';
 
 const PostReview = () => {
   const [starRating, setStarRating] = useState(0);
-  const [reviewText, setReviewText] = useState('');
-  const [title, setTitle] = useState('');
+  const [reviewContent, setReviewContent] = useState('');
+  const [reviewTitle, setReviewTitle] = useState('');
   const [image, setImage] = useState(null);
   const searchParams = useSearchParams();
   const Id = searchParams.get('id');
@@ -24,8 +24,8 @@ const PostReview = () => {
     // formData.append('score', starRating.toString());
     // formData.append('martId', martId.toString());
 
-    console.log("title:", title);
-    console.log("reviewText:", reviewText);
+    console.log("reviewTitle:", reviewTitle);
+    console.log("reviewContent:", reviewContent);
     console.log("starRating:",starRating);
     console.log("martId", martId);
 
@@ -46,8 +46,8 @@ const PostReview = () => {
           },
           // body: formData
           body: JSON.stringify({
-            title: title,
-            reviewContent: reviewText,
+            title: reviewTitle,
+            reviewContent: reviewContent,
             score: starRating,
             martId: martId
           })
@@ -84,8 +84,8 @@ const PostReview = () => {
           className="block mb-5 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 resize-none" 
           minLength={1}
           placeholder="제목을 입력해주세요."
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          value={reviewTitle}
+          onChange={(e) => setReviewTitle(e.target.value)}
         >
         </textarea>
 
@@ -97,8 +97,8 @@ const PostReview = () => {
           minLength={15} 
           className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 resize-none" 
           placeholder="마트의 어떤 점이 좋았나요? 판매하는 상품의 품질은 어떤가요? 15자 이상 작성해주세요."
-          value={reviewText}
-          onChange={(e) => setReviewText(e.target.value)}
+          value={reviewContent}
+          onChange={(e) => setReviewContent(e.target.value)}
         >
         </textarea>
 
