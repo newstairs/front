@@ -17,11 +17,12 @@ const PostReview = () => {
 
   // api 통신 로직은 수정예정이다.(마트 이름과 마트 정보를 가져와야하는 추가 보수 사항이 존재)
   const handleReviewSubmit = async () => {
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('reviewContent', reviewText);
-    formData.append('score', starRating.toString());
-    formData.append('martId', martId.toString());
+    // const formData = new FormData();
+    // formData.append('title', title);
+    // formData.append('reviewContent', reviewText);
+    // formData.append('score', starRating.toString());
+    // formData.append('martId', martId.toString());
+    
     // if (image) {
     //   formData.append('image', image);
     // }
@@ -36,7 +37,13 @@ const PostReview = () => {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('access_token')}`
           },
-          body: formData
+          // body: formData
+          body: JSON.stringify({
+            title: title,
+            reviewContent: reviewText,
+            score: starRating,
+            martId: martId
+          })
         });
   
         if (response.ok) {

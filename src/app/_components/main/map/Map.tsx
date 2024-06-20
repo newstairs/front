@@ -1156,12 +1156,12 @@ const KakaoMapComponent = ({center}) => {
   }
     if(marker_function_save_maps!==null){
       for(const key of marker_function_save_maps.keys()){
-       window.kakao.maps.event.removeListener(key,'click',marker_function_save_maps.get(key));
+        window.kakao.maps.event.removeListener(key,'click',marker_function_save_maps.get(key));
       }
     }
     if(marker_tracker_maps!==null){
       for(const x of marker_tracker_maps.values()){
-       x.stop();//마커 트레이서기능을 종료시키는 과정.
+        x.stop();//마커 트레이서기능을 종료시키는 과정.
       }
     }
     if(marker_save_maps!==null){
