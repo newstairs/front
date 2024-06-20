@@ -14,6 +14,7 @@ const KakaoCallback: React.FC = () => {
 
   useEffect(() => {
     const codeValue = code.get('code');
+    
     if(codeValue) {
       console.log("code:", codeValue.substring(1));
     } else {
