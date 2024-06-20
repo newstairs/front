@@ -423,7 +423,7 @@ fetchdata()
             {(items || []).map(item => (
               <li id={item.productId.toString()} key={item.productId} className="item_list w-full flex items-center p-2 bg-white rounded-lg shadow-md">
                 <input type="checkbox" className="mr-2" />
-                <img src={item.productImgUrl} alt={item.productName} className="h-10 w-10 object-cover mr-2" />
+                {/* <img src={item.productImgUrl} alt={item.productName} className="h-10 w-10 object-cover mr-2" /> */}
                 <span className="flex-grow">{item.productName}</span>
                 <div className="flex items-center">
                   <button
