@@ -157,7 +157,7 @@ const SendMap:React.FC<MapProps> = ({address,martid,martname}) => {
             a.textContent=star;
             a.style.color="red";
             a.target="_blank";
-            let m="http://localhost:3000/reviews/deatil/35"
+            let m=`http://localhost:3000/reviews/deatil/35`;
             console.log("test:","http://localhost:3000/detail/35".substring(30,m.length))
             a.href=`http://localhost:3000/reviews/detail/${martid}`;
             //over_lay_star.appendChild(a);
@@ -165,7 +165,7 @@ const SendMap:React.FC<MapProps> = ({address,martid,martname}) => {
           makestar(4.5);
       
           console.log("martId:",martid);
-   
+  
       
           over_lay_main.appendChild(over_lay_star);
           over_lay_main.appendChild(over_lay_cart_list_btn);

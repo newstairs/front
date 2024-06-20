@@ -3,7 +3,7 @@ import PostReview from '@/app/_components/review/PostReview'
 
 const PostReviewPage = () => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense>
       <PostReview /> 
     </Suspense>
   )

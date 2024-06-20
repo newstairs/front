@@ -1235,7 +1235,6 @@ const KakaoMapComponent = ({center}) => {
     if(function_memmory===null){
         console.log("event memeory")
         set_function_memmorty(()=>activeasync2);
-           
     }
     else{
             

@@ -380,6 +380,7 @@ const CartList: React.FC = () => {
       });
 
       const data = await response.json();
+      console.log(data)
       if (data && data.data && Array.isArray(data.data)) {
         setItem(data.data);
         sethasitems(data.data.length > 0);
