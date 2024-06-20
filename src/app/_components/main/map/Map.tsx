@@ -61,9 +61,9 @@ const KakaoMapComponent = ({center}) => {
   const[zoom_func,set_zoom_func]=useState(null);
   // 상태 관리
   const [map, setMap] = useState(null); // map 상태를 초기화합니다.
- 
+
   const [zoom,setzoom]=useState(true);
- 
+
   const [function_memmory,set_function_memmorty]=useState(null);
 
   const [weather_modal,set_weather_modal]=useState(true);
