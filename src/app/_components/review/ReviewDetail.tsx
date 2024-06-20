@@ -113,10 +113,14 @@ const ReviewDetails: React.FC<Detail> = ({id}) => {
         <li key={x.reviewId} 
             className="flex justify-between items-center p-4 hover:bg-gray-100 rounded-md cursor-pointer transition-colors"
             onClick={() => { show_review_page(x.reviewContent, x.reviewTitle) }}>
-          <span className="text-gray-800 text-sm">
-            {x.reviewTitle}
-            {x.reviewContent}
-          </span>
+          <div className='review-content'>
+            <span className="mb-2 text-gray-800 text-base">
+              {x.reviewTitle}
+            </span>
+            <span className="text-gray-800 text-sm">
+              {x.reviewContent}
+            </span>
+          </div>
           <span className="text-yellow-500 text-lg">
             {makestar(x.score)}
           </span>
