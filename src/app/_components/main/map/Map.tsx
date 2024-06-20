@@ -968,7 +968,7 @@ const KakaoMapComponent = ({center}) => {
 
     over_lay_main.className = "bg-white rounded-lg shadow-lg p-4 w-[200px] h-[250px] relative";
     //over_lay_serve.className = "bg-red-100 rounded-t-lg w-full h-[150px] mb-2";
-    over_lay_cart_list_btn.className = "bg-blue-500 text-sm text-white rounded-full w-[38px] h-[38px] absolute right-2 bottom";
+    over_lay_cart_list_btn.className = "bg-blue-500 text-sm text-white rounded-full w-[38px] h-[38px] absolute right-2 bottom-0";
     over_lay_cart_list.className = "bg-amber-400 rounded-lg shadow-lg w-[250px] h-[250px] p-2 absolute bottom-[60px] left-[-20px] z-30 overflow-auto hidden";
     over_lay_star.className = "flex justify-center items-center bg-slate-500 text-white rounded-b-lg w-full h-[40px] absolute bottom-0 left-0"; 
     over_lay_cart_list_btn.innerText = "자세히";
