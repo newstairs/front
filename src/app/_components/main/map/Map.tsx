@@ -442,10 +442,11 @@ const KakaoMapComponent = ({center}) => {
           return res.json();
         }
       )
+      console.log('기상청 특보데이터:',data);
       try {
         let strs = data.response.body.items.item[0].title;
         let arr = strs.split(" ");
-        weatherdata["특보데이터"] = ""
+        weatherdata["특보데이터"] = null;
         for (const x of arr) {
           if (x.includes("주의보")) {
             weatherdata["특보데이터"] += x;
