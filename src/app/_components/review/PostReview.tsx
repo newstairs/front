@@ -9,7 +9,8 @@ const PostReview = () => {
   const [title, setTitle] = useState('');
   const [image, setImage] = useState(null);
   const searchParams = useSearchParams();
-  const martId = searchParams.get('id');
+  const Id = searchParams.get('id');
+  const martId = parseInt(Id, 10);
 
   const BACKEND_URI = process.env.NEXT_PUBLIC_BACKEND_URI
 
