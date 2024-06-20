@@ -117,6 +117,7 @@ const ReviewDetails: React.FC<Detail> = ({id}) => {
             <span className="mb-2 text-gray-800 text-base">
               {x.reviewTitle}
             </span>
+            <br/>
             <span className="text-gray-800 text-sm">
               {x.reviewContent}
             </span>
