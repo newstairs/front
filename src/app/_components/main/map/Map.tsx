@@ -437,7 +437,7 @@ const KakaoMapComponent = ({center}) => {
 
       stnId = getstnid(area_name);
 
-      data = await fetch (`http://apis.data.go.kr/1360000/WthrWrnInfoService/getWthrWrnList?serviceKey=${serviceKey}&numOfRows=10&pageNo=1&dataType=JSON&fromTmFc=${fromTmFc}&toTmFc=${toTmFc}&stnId=${stnId}`,option)
+      data = await fetch (`https://apis.data.go.kr/1360000/WthrWrnInfoService/getWthrWrnList?serviceKey=${serviceKey}&numOfRows=10&pageNo=1&dataType=JSON&fromTmFc=${fromTmFc}&toTmFc=${toTmFc}&stnId=${stnId}`,option)
         .then((res)=>{
           return res.json();
         }
