@@ -442,6 +442,7 @@ const KakaoMapComponent = ({center}) => {
           return res.json();
         }
       )
+      console.log('기상청 특보데이터:',data);
       try {
         let strs = data.response.body.items.item[0].title;
         let arr = strs.split(" ");
